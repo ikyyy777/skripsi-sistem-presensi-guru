@@ -1,8 +1,9 @@
+import 'dart:io';
+
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:permission_handler/permission_handler.dart';
 import 'package:presensi_guru/utils/get_dialogs.dart';
 import 'package:presensi_guru/utils/routes.dart';
 
@@ -66,7 +67,7 @@ class LoginController extends GetxController {
               Get.toNamed(Routes.adminDashboardView);
             } else {
               Get.back();
-              GetDialogs.showDialog1("Login Gagal!", "IMEI tidak cocok");
+              GetDialogs.showDialog1("Login Gagal!", "IMEI perangkat kamu tidak cocok");
             }
           }
           return;
@@ -126,19 +127,14 @@ class LoginController extends GetxController {
   }
 
   Future<String?> getIMEI() async {
-    // Periksa dan minta izin READ_PHONE_STATE
-    PermissionStatus status = await Permission.phone.status;
-    if (!status.isGranted) {
-      status = await Permission.phone.request();
-      if (!status.isGranted) {
-        return 'Permission Denied';
-      }
+    final deviceInfo = DeviceInfoPlugin();
+    if (Platform.isAndroid) {
+      final androidInfo = await deviceInfo.androidInfo;
+      return androidInfo.id; // Gunakan Android ID sebagai alternatif
+    } else if (Platform.isIOS) {
+      final iosInfo = await deviceInfo.iosInfo;
+      return iosInfo.identifierForVendor; // iOS Identifier
     }
-
-    // Dapatkan informasi perangkat
-    DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
-    AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
-
-    return androidInfo.id;
+    return null;
   }
 }

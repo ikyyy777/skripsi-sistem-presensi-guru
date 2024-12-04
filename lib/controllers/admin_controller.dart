@@ -101,8 +101,8 @@ class AdminController extends GetxController {
       if (querySnapshot.docs.isNotEmpty) {
         // Tampilkan pesan error menggunakan ErrorHandlers
         GetDialogs.showDialog1(
-          "Username sudah terdaftar!",
-          "Username yang Anda masukkan sudah digunakan. Silakan pilih username lain.",
+          "Guru sudah terdaftar!",
+          "Username guru yang Anda masukkan sudah digunakan. Silakan pilih username lain.",
         );
         return;
       }

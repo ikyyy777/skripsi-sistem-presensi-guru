@@ -27,12 +27,18 @@ class GuruProfileWidget extends StatelessWidget {
           ),
           borderRadius: BorderRadius.circular(90),
         ),
-        child: const Icon(Icons.person_2_rounded, size: 50),
+        child: Icon(
+          Icons.person_2_rounded,
+          size: 50,
+          color: ColorConstant.gray30,
+        ),
       ),
       title: Text(
         "Selamat ${DatetimeGetters.getTimeOfDay()}",
-        style: TextstyleConstant.nunitoSansBold
-            .copyWith(fontSize: 12, color: ColorConstant.black50),
+        style: TextstyleConstant.nunitoSansBold.copyWith(
+          fontSize: 12,
+          color: ColorConstant.black50,
+        ),
       ),
       subtitle: Obx(
         () => Row(

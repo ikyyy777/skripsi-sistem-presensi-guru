@@ -3,8 +3,6 @@ import 'package:get/get.dart';
 import 'package:presensi_guru/constants/color_constant.dart';
 import 'package:presensi_guru/constants/textstyle_constant.dart';
 import 'package:presensi_guru/controllers/guru_controller.dart';
-import 'package:presensi_guru/models/presensi_model.dart';
-import 'package:presensi_guru/utils/datetime_getters.dart';
 import 'package:presensi_guru/views/guru_rekap_presensi/widgets/prediode_bulan_rekap_widget.dart';
 import 'package:presensi_guru/views/guru_rekap_presensi/widgets/riwayat_presensi_widget.dart';
 

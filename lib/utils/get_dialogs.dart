@@ -9,6 +9,10 @@ class GetDialogs {
   static void showDialog1(String title, String message) {
     Get.dialog(
       AlertDialog(
+        shape: RoundedRectangleBorder(
+          borderRadius:
+              BorderRadius.circular(10),
+        ),
         title: Text(
           title,
           style: TextstyleConstant.nunitoSansMedium.copyWith(

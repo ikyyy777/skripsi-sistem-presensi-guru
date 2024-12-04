@@ -76,7 +76,7 @@ class AdminCardWidget extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
                         Text(
-                          "IMEI PERANGKAT",
+                          "ID Perangkat",
                           style: TextstyleConstant.nunitoSansMedium.copyWith(
                             fontSize: 14,
                             color: ColorConstant.white,

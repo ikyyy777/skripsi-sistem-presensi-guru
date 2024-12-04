@@ -3,6 +3,8 @@ import 'package:get/get.dart';
 import 'package:presensi_guru/constants/color_constant.dart';
 import 'package:presensi_guru/constants/textstyle_constant.dart';
 import 'package:presensi_guru/controllers/admin_controller.dart';
+import 'package:presensi_guru/global_widgets/custom_global_form_field.dart';
+import 'package:presensi_guru/global_widgets/gender_global_dropdown_field.dart';
 
 class FormulirTambahGuruView extends StatelessWidget {
   FormulirTambahGuruView({super.key});
@@ -52,29 +54,35 @@ class FormulirTambahGuruView extends StatelessWidget {
                 ),
                 const Divider(),
                 const SizedBox(height: 10),
-                CustomFormField(
+                CustomGlobalFormField(
                   adminController: adminController,
                   title: "Nama Pengguna",
                   value: adminController.formUsername,
-                  hintText: "username1",
+                  hintText: "nama pengguna",
                   dataType: 'String',
                   validator: (value) {
                     if (value!.isEmpty) {
                       return 'Nama pengguna tidak boleh kosong';
                     }
+                    if (value.contains(' ')) {
+                      return 'Nama pengguna tidak boleh mengandung spasi';
+                    }
                     return null;
                   },
                 ),
                 const SizedBox(height: 10),
-                CustomFormField(
+                CustomGlobalFormField(
                   adminController: adminController,
-                  title: "Password",
+                  title: "Kata Sandi",
                   value: adminController.formPassword,
-                  hintText: "password",
+                  hintText: "kata sandi",
                   dataType: 'String',
                   validator: (value) {
                     if (value!.isEmpty) {
-                      return 'Password tidak boleh kosong';
+                      return 'Kata sandi tidak boleh kosong';
+                    }
+                    if (value.contains(' ')) {
+                      return 'Kata sandi tidak boleh mengandung spasi';
                     }
                     return null;
                   },
@@ -88,7 +96,7 @@ class FormulirTambahGuruView extends StatelessWidget {
                 ),
                 const Divider(),
                 const SizedBox(height: 10),
-                CustomFormField(
+                CustomGlobalFormField(
                   adminController: adminController,
                   title: "Nama Lengkap",
                   value: adminController.formName,
@@ -98,25 +106,29 @@ class FormulirTambahGuruView extends StatelessWidget {
                     if (value!.isEmpty) {
                       return 'Nama lengkap tidak boleh kosong';
                     }
+                    // Cek apakah nama lengkap mengandung angka atau simbol selain huruf dan spasi
+                    if (!RegExp(r'^[a-zA-Z\s]+$').hasMatch(value)) {
+                      return 'Nama lengkap hanya boleh mengandung huruf';
+                    }
                     return null;
                   },
                 ),
                 const SizedBox(height: 10),
-                CustomFormField(
+                GenderGlobalDropdownField(
                   adminController: adminController,
                   title: "Jenis Kelamin",
-                  value: adminController.formGender,
-                  hintText: "Jenis Kelamin",
+                  value: adminController.formGender.text,
+                  hintText: "Pilih Jenis Kelamin",
                   dataType: 'String',
                   validator: (value) {
-                    if (value!.isEmpty) {
+                    if (value == null || value.isEmpty) {
                       return 'Jenis kelamin tidak boleh kosong';
                     }
                     return null;
                   },
                 ),
                 const SizedBox(height: 10),
-                CustomFormField(
+                CustomGlobalFormField(
                   adminController: adminController,
                   title: "Tempat, Tanggal Lahir",
                   value: adminController.formPlaceDateOfBirth,
@@ -130,7 +142,7 @@ class FormulirTambahGuruView extends StatelessWidget {
                   },
                 ),
                 const SizedBox(height: 10),
-                CustomFormField(
+                CustomGlobalFormField(
                   adminController: adminController,
                   title: "Agama",
                   value: adminController.formReligion,
@@ -144,11 +156,11 @@ class FormulirTambahGuruView extends StatelessWidget {
                   },
                 ),
                 const SizedBox(height: 10),
-                CustomFormField(
+                CustomGlobalFormField(
                   adminController: adminController,
                   title: "Alamat",
                   value: adminController.formAddress,
-                  hintText: "Alamat",
+                  hintText: "Alamat Lengkap",
                   dataType: 'String',
                   validator: (value) {
                     if (value!.isEmpty) {
@@ -158,7 +170,7 @@ class FormulirTambahGuruView extends StatelessWidget {
                   },
                 ),
                 const SizedBox(height: 10),
-                CustomFormField(
+                CustomGlobalFormField(
                   adminController: adminController,
                   title: "Email",
                   value: adminController.formEmail,
@@ -172,7 +184,7 @@ class FormulirTambahGuruView extends StatelessWidget {
                   },
                 ),
                 const SizedBox(height: 10),
-                CustomFormField(
+                CustomGlobalFormField(
                   adminController: adminController,
                   title: "Nomor Telepon",
                   value: adminController.formPhoneNumber,
@@ -194,7 +206,7 @@ class FormulirTambahGuruView extends StatelessWidget {
                 ),
                 const Divider(),
                 const SizedBox(height: 10),
-                CustomFormField(
+                CustomGlobalFormField(
                   adminController: adminController,
                   title: "NIP",
                   value: adminController.formNIP,
@@ -207,7 +219,7 @@ class FormulirTambahGuruView extends StatelessWidget {
                   },
                 ),
                 const SizedBox(height: 10),
-                CustomFormField(
+                CustomGlobalFormField(
                   adminController: adminController,
                   title: "NUPTK",
                   value: adminController.formNUPTK,
@@ -254,79 +266,6 @@ class FormulirTambahGuruView extends StatelessWidget {
           ),
         ),
       ),
-    );
-  }
-}
-
-class CustomFormField extends StatelessWidget {
-  const CustomFormField({
-    super.key,
-    required this.adminController,
-    required this.title,
-    required this.value,
-    required this.hintText,
-    required this.dataType,
-    required this.validator,
-  });
-
-  final AdminController adminController;
-  final String title;
-  final TextEditingController value;
-  final String hintText;
-  final String dataType;
-  final FormFieldValidator<String> validator; // Validator ditambahkan
-
-  @override
-  Widget build(BuildContext context) {
-    // Tentukan keyboardType berdasarkan dataType
-    TextInputType keyboardType = TextInputType.text;
-    if (dataType == 'int') {
-      keyboardType =
-          TextInputType.number; // Untuk integer, gunakan keyboard angka
-    }
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          title,
-          style: TextstyleConstant.nunitoSansBold.copyWith(
-            fontSize: 14,
-            color: ColorConstant.black50,
-          ),
-        ),
-        const SizedBox(height: 5),
-        TextFormField(
-          controller: value,
-          keyboardType: keyboardType,
-          decoration: InputDecoration(
-            enabledBorder: OutlineInputBorder(
-              borderSide: BorderSide(color: ColorConstant.grayBorder),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderSide: BorderSide(color: ColorConstant.blue),
-            ),
-            errorBorder: OutlineInputBorder(
-              // Menambahkan errorBorder
-              borderSide: BorderSide(
-                  color: ColorConstant.red), // Warna merah untuk border error
-            ),
-            focusedErrorBorder: OutlineInputBorder(
-              // Menambahkan focusedErrorBorder
-              borderSide: BorderSide(color: ColorConstant.red),
-            ),
-            hintText: hintText,
-            hintStyle: TextstyleConstant.nunitoSansMedium.copyWith(
-              color: ColorConstant.black50,
-            ),
-            contentPadding: const EdgeInsets.symmetric(
-              vertical: 10,
-              horizontal: 12,
-            ),
-          ),
-          validator: validator,
-        ),
-      ],
     );
   }
 }
