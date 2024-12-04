@@ -1,10 +1,12 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:presensi_guru/utils/routes.dart';
 import 'package:presensi_guru/views/admin_dashboard/admin_dashboard_view.dart';
+import 'package:presensi_guru/views/formulir_tambah_guru/formulir_tambah_guru_view.dart';
 import 'package:presensi_guru/views/guru_dashboard/guru_dashboard_view.dart';
+import 'package:presensi_guru/views/guru_rekap_presensi/guru_riwayat_presensi_view.dart';
 import 'package:presensi_guru/views/login/login_view.dart';
 import 'package:presensi_guru/views/splashscreen/splashscreen_view.dart';
 import 'firebase_options.dart';
@@ -16,6 +18,11 @@ void main() async{
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+
+  await SystemChrome.setPreferredOrientations([
+    DeviceOrientation.portraitUp,
+    DeviceOrientation.portraitDown,
+  ]);
 
   runApp(MyApp());
 }
@@ -43,6 +50,14 @@ class MyApp extends StatelessWidget {
         GetPage(
           name: Routes.adminDashboardView,
           page: () => AdminDashboardView(),
+        ),
+        GetPage(
+          name: Routes.formulirTambahGuruView,
+          page: () => FormulirTambahGuruView(),
+        ),
+        GetPage(
+          name: Routes.guruRiwayatPresensiView,
+          page: () => GuruRiwayatPresensiView(),
         ),
       ],
     );

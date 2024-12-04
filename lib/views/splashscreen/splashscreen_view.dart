@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:presensi_guru/utils/routes.dart';
 
 class SplashscreenView extends StatefulWidget {
   const SplashscreenView({super.key});
@@ -8,6 +10,14 @@ class SplashscreenView extends StatefulWidget {
 }
 
 class _SplashscreenViewState extends State<SplashscreenView> {
+  @override
+  void initState() {
+    super.initState();
+    Future.delayed(const Duration(seconds: 2), () {
+      Get.offAllNamed(Routes.loginView);
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
