@@ -10,7 +10,6 @@ import 'package:presensi_guru/models/guru_model.dart';
 import 'package:presensi_guru/models/presensi_model.dart';
 import 'package:presensi_guru/utils/datetime_getters.dart';
 import 'package:presensi_guru/utils/get_dialogs.dart';
-import 'package:wifi_iot/wifi_iot.dart';
 
 class GuruController extends GetxController {
   FirebaseFirestore firestore = FirebaseFirestore.instance;
