@@ -236,7 +236,7 @@ class AdminController extends GetxController {
               color: ColorConstant.black,
             ),
           ),
-          content: const Text("Apakah Anda yakin ingin menghapus guru ini?"),
+          content: const Text("Data presensi guru juga akan dihapus. Apakah Anda yakin ingin menghapus guru ini?"),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context, false), // Batal
@@ -256,6 +256,7 @@ class AdminController extends GetxController {
       // Jika pengguna mengkonfirmasi hapus
       if (confirm == true) {
         await firestore.collection('pegawai').doc(username).delete();
+        await firestore.collection('presensi').doc(username).delete();
         await fetchDataGuru();
 
         GetDialogs.showSnackBar1("Guru Dihapus", "Berhasil hapus guru");
