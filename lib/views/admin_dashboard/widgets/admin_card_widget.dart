@@ -84,7 +84,7 @@ class AdminCardWidget extends StatelessWidget {
                         ),
                         Obx(
                           () => Text(
-                            adminController.IMEI.value,
+                            adminController.deviceId.value,
                             style: TextstyleConstant.nunitoSansBold.copyWith(
                               fontSize: 16,
                               color: ColorConstant.white,

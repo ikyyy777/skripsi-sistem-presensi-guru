@@ -31,7 +31,7 @@ class AdminController extends GetxController {
   RxList<GuruModel> daftarGuru = <GuruModel>[].obs;
 
   RxInt totalGuru = 0.obs;
-  RxString IMEI = "".obs;
+  RxString deviceId = "".obs;
 
   DatetimeGetters datetimeGetters = DatetimeGetters();
 
@@ -57,12 +57,12 @@ class AdminController extends GetxController {
 
     totalGuru.value = documentCount - 1;
 
-    // mendapatkan IMEI ponsel terdaftar
+    // mendapatkan device id ponsel terdaftar
     DocumentSnapshot adminDoc =
         await firestore.collection("pegawai").doc("admin").get();
     if (adminDoc.exists) {
       final adminData = adminDoc.data() as Map<String, dynamic>;
-      IMEI.value = adminData["IMEI"];
+      deviceId.value = adminData["id_perangkat"];
     } else {
       GetDialogs.showDialog1(
           "Kesalahan Fatal!", "Tidak dapat terhubung ke database!");

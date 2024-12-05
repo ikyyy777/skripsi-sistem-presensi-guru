@@ -49,19 +49,19 @@ class LoginController extends GetxController {
           // Dapatkan IMEI perangkat
           String? imei = await getIMEI();
 
-          if (adminData['IMEI'] == null || adminData['IMEI'] == "") {
+          if (adminData['id_perangkat'] == null || adminData['id_perangkat'] == "") {
             if (imei != null && imei != 'Permission Denied') {
               // Update IMEI di Firestore
               await firestore
                   .collection('pegawai')
                   .doc('admin')
-                  .update({'IMEI': imei});
+                  .update({'id_perangkat': imei});
             }
             Get.back();
             loggedUsername.value = username.text;
             Get.toNamed(Routes.adminDashboardView);
           } else {
-            if (adminData['IMEI'] == imei) {
+            if (adminData['id_perangkat'] == imei) {
               Get.back();
               loggedUsername.value = username.text;
               Get.toNamed(Routes.adminDashboardView);
@@ -85,20 +85,20 @@ class LoginController extends GetxController {
           String? imei = await getIMEI();
 
           // Cek apakah guru pertama kali login
-          if (guruData['IMEI'] == null || guruData['IMEI'] == "") {
+          if (guruData['id_perangkat'] == null || guruData['id_perangkat'] == "") {
             if (imei != null && imei != 'Permission Denied') {
               // Update IMEI di Firestore
-              guruData['IMEI'] = imei;
+              guruData['id_perangkat'] = imei;
               await firestore
                   .collection('pegawai')
                   .doc(inputUsername)
-                  .update({'IMEI': imei});
+                  .update({'id_perangkat': imei});
             }
             Get.back();
             loggedUsername.value = username.text;
             Get.toNamed(Routes.guruDashboardView);
           } else {
-            if (guruData['IMEI'] == imei) {
+            if (guruData['id_perangkat'] == imei) {
               Get.back();
               loggedUsername.value = username.text;
               Get.toNamed(Routes.guruDashboardView);
