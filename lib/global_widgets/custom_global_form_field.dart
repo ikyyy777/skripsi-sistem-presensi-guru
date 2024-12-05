@@ -12,6 +12,7 @@ class CustomGlobalFormField extends StatelessWidget {
     required this.hintText,
     required this.dataType,
     required this.validator,
+    this.enable = true,
   });
 
   final AdminController adminController;
@@ -19,7 +20,8 @@ class CustomGlobalFormField extends StatelessWidget {
   final TextEditingController value;
   final String hintText;
   final String dataType;
-  final FormFieldValidator<String> validator; // Validator ditambahkan
+  final FormFieldValidator<String> validator;
+  final bool enable;
 
   @override
   Widget build(BuildContext context) {
@@ -42,9 +44,13 @@ class CustomGlobalFormField extends StatelessWidget {
         ),
         const SizedBox(height: 5),
         TextFormField(
+          enabled: enable,
           controller: value,
           keyboardType: keyboardType,
           decoration: InputDecoration(
+            disabledBorder: OutlineInputBorder(
+              borderSide: BorderSide(color: ColorConstant.grayBorder),
+            ),
             enabledBorder: OutlineInputBorder(
               borderSide: BorderSide(color: ColorConstant.grayBorder),
             ),

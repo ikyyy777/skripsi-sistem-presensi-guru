@@ -216,6 +216,7 @@ class FormulirTambahGuruView extends StatelessWidget {
                     if (value!.isEmpty) {
                       return null;
                     }
+                    return null;
                   },
                 ),
                 const SizedBox(height: 10),
@@ -229,6 +230,7 @@ class FormulirTambahGuruView extends StatelessWidget {
                     if (value!.isEmpty) {
                       return null;
                     }
+                    return null;
                   },
                 ),
                 const SizedBox(height: 25),

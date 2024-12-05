@@ -99,6 +99,7 @@ class FormulirEditGuru extends StatelessWidget {
                 const Divider(),
                 const SizedBox(height: 10),
                 CustomGlobalFormField(
+                  enable: false,
                   adminController: adminController,
                   title: "Nama Pengguna",
                   value: formUsername,
@@ -250,6 +251,7 @@ class FormulirEditGuru extends StatelessWidget {
                     if (value!.isEmpty) {
                       return null;
                     }
+                    return null;
                   },
                 ),
                 const SizedBox(height: 10),
@@ -263,6 +265,7 @@ class FormulirEditGuru extends StatelessWidget {
                     if (value!.isEmpty) {
                       return null;
                     }
+                    return null;
                   },
                 ),
                 const SizedBox(height: 25),
