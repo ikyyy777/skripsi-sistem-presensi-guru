@@ -43,29 +43,23 @@ class GuruRiwayatPresensiWidget extends StatelessWidget {
         ),
         const SizedBox(height: 20),
         Obx(() {
-          // Mendapatkan bulan saat ini
-          String currentMonthIndo =
-              DatetimeGetters.bulanIndo[DateTime.now().month - 1];
+          final riwayatPresensiData = guruController.presensiModel.value;
 
-          // Mengambil presensi bulan ini
-          Presensi? monthPresensi = guruController
-              .presensiModel.value!.presensiData.values
-              .expand((yearData) => yearData)
-              .where((presensi) => presensi.bulan == currentMonthIndo)
-              .firstWhere(
-                (presensi) =>
-                    true, // Pastikan ada setidaknya satu data yang cocok
-                orElse: () => Presensi(
-                  bulan: currentMonthIndo,
-                  totalHadir: 0,
-                  totalCuti: 0,
-                  totalTelat: 0,
-                  riwayatPresensi: [],
+          // Jika presensiModel null, tampilkan pesan default
+          if (riwayatPresensiData == null) {
+            return Center(
+              child: Text(
+                "Data presensi tidak tersedia",
+                style: TextstyleConstant.nunitoSansMedium.copyWith(
+                  fontSize: 14,
+                  color: ColorConstant.gray30,
                 ),
-              );
+              ),
+            );
+          }
 
           // Menghitung total riwayat presensi dan limit menjadi 5
-          int totalPresensi = monthPresensi.riwayatPresensi.length;
+          int totalPresensi = riwayatPresensiData.riwayatPresensi.length;
           totalPresensi = totalPresensi > 5 ? 5 : totalPresensi;
 
           if (totalPresensi == 0) {
@@ -85,15 +79,14 @@ class GuruRiwayatPresensiWidget extends StatelessWidget {
               itemCount: totalPresensi,
               itemBuilder: (BuildContext context, int index) {
                 // Ambil data riwayat presensi pada bulan ini, dibalik urutannya
-                var presensiItem =
-                    monthPresensi.riwayatPresensi.reversed.toList()[index];
+                var presensiItem = riwayatPresensiData.riwayatPresensi.reversed
+                    .toList()[index];
 
                 return Container(
                   margin: const EdgeInsets.only(bottom: 20),
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(10),
-                    border: Border.all(
-                        color: ColorConstant.grayBorder), // Border color
+                    border: Border.all(color: ColorConstant.grayBorder),
                   ),
                   child: ListTile(
                     title: Text(

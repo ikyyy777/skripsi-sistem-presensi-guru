@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:developer';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -34,16 +35,31 @@ class AdminController extends GetxController {
   RxString deviceId = "".obs;
 
   DatetimeGetters datetimeGetters = DatetimeGetters();
+  Timer? backgroundTask;
 
   @override
   void onInit() {
     super.onInit();
     initPage();
+    startBackgroundTask();
+  }
+
+  @override
+  void onClose() {
+    super.onClose();
+    backgroundTask?.cancel();
   }
 
   Future<void> initPage() async {
     await fetchAdminCardData();
     await fetchDataGuru();
+  }
+
+  void startBackgroundTask() {
+    backgroundTask =
+        Timer.periodic(const Duration(seconds: 1), (Timer timer) async {
+      initPage();
+    });
   }
 
   Future<void> fetchAdminCardData() async {
@@ -90,77 +106,51 @@ class AdminController extends GetxController {
   }
 
   Future<void> addGuru() async {
-    try {
-      // Periksa apakah username sudah ada di collection "pegawai"
-      QuerySnapshot querySnapshot = await firestore
-          .collection('pegawai')
-          .where('username', isEqualTo: formUsername.text)
-          .get();
+    // Periksa apakah username sudah ada di collection "pegawai"
+    QuerySnapshot querySnapshot = await firestore
+        .collection('pegawai')
+        .where('username', isEqualTo: formUsername.text)
+        .get();
 
-      // Jika username sudah ada
-      if (querySnapshot.docs.isNotEmpty) {
-        // Tampilkan pesan error menggunakan ErrorHandlers
-        GetDialogs.showDialog1(
-          "Guru sudah terdaftar!",
-          "Username guru yang Anda masukkan sudah digunakan. Silakan pilih username lain.",
-        );
-        return;
-      }
-
-      // Jika username belum ada, buat data guru baru di collection "pegawai"
-      await firestore.collection('pegawai').doc(formUsername.text).set({
-        'username': formUsername.text,
-        'password': formPassword.text,
-        'nama': formName.text,
-        'jenis_kelamin': formGender.text,
-        'tempat_tanggal_lahir': formPlaceDateOfBirth.text,
-        'agama': formReligion.text,
-        'alamat': formAddress.text,
-        'email': formEmail.text,
-        'no_hp': formPhoneNumber.text,
-        'NIP': formNIP.text,
-        'NUPTK': formNUPTK.text,
-        'IMEI': "",
-        'dibuat_pada': FieldValue.serverTimestamp(),
-      });
-
-      String yearNow = DatetimeGetters.getYearNow();
-      String monthNow = DateTime.now().month.toString();
-      String monthNowIndo = DatetimeGetters.bulanIndo[int.parse(monthNow) - 1];
-      // Tambahkan dokumen baru di collection "presensi" dengan nama username
-      await firestore.collection('presensi').doc(formUsername.text).set({
-        yearNow: [
-          {
-            "bulan": monthNowIndo,
-            "total_hadir": 0,
-            "total_cuti": 0,
-            "total_telat": 0,
-            "riwayat_presensi": []
-          }
-        ]
-      });
-
-      // Setelah berhasil menambah data guru, reset form fields jika diperlukan
-      formUsername.clear();
-      formPassword.clear();
-      formName.clear();
-      formGender.clear();
-      formPlaceDateOfBirth.clear();
-      formReligion.clear();
-      formAddress.clear();
-      formEmail.clear();
-      formPhoneNumber.clear();
-      formNIP.clear();
-      formNUPTK.clear();
-
-      // Opsional: Informasi sukses setelah menambah guru baru
-      GetDialogs.showSnackBar1("Guru Ditambahkan", "Berhasil menambah guru");
-    } catch (e) {
-      // Tangani error lainnya jika terjadi
+    if (querySnapshot.docs.isNotEmpty) {
       GetDialogs.showDialog1(
-          "Kesalahan!", "Terjadi kesalahan saat menambahkan guru.");
-      log('Error adding guru: $e');
+        "Guru sudah terdaftar!",
+        "Username guru yang Anda masukkan sudah digunakan. Silakan pilih username lain.",
+      );
+      return;
     }
+
+    // Tambah data pegawai ke koleksi "pegawai"
+    await firestore.collection('pegawai').doc(formUsername.text).set({
+      'username': formUsername.text,
+      'password': formPassword.text,
+      'nama': formName.text,
+      'jenis_kelamin': formGender.text,
+      'tempat_tanggal_lahir': formPlaceDateOfBirth.text,
+      'agama': formReligion.text,
+      'alamat': formAddress.text,
+      'email': formEmail.text,
+      'no_hp': formPhoneNumber.text,
+      'NIP': formNIP.text,
+      'NUPTK': formNUPTK.text,
+      'id_perangkat': "",
+      'dibuat_pada': FieldValue.serverTimestamp(),
+    });
+
+    // Reset form fields
+    formUsername.clear();
+    formPassword.clear();
+    formName.clear();
+    formGender.clear();
+    formPlaceDateOfBirth.clear();
+    formReligion.clear();
+    formAddress.clear();
+    formEmail.clear();
+    formPhoneNumber.clear();
+    formNIP.clear();
+    formNUPTK.clear();
+
+    GetDialogs.showSnackBar1("Guru Ditambahkan", "Berhasil menambah guru");
   }
 
   Future<void> updatePassword(String newPassword) async {
@@ -198,12 +188,14 @@ class AdminController extends GetxController {
     required String nip,
     required String nuptk,
     required String password,
+    required String idPerangkat,
   }) async {
     try {
+      // Update data guru di collection "Pegawai"
       await firestore.collection('pegawai').doc(username).update({
         'nama': nama,
         'jenis_kelamin': jenisKelamin,
-        'tempat_tanggal_lahir': tempatTanggalLahir,
+        'tempat_lahir': tempatTanggalLahir,
         'agama': agama,
         'alamat': alamat,
         'email': email,
@@ -211,9 +203,11 @@ class AdminController extends GetxController {
         'NIP': nip,
         'NUPTK': nuptk,
         'password': password,
+        'id_perangkat': idPerangkat,
       });
 
-      GetDialogs.showSnackBar1("Guru Diperbarui", "Berhasil memperbarui data guru");
+      GetDialogs.showSnackBar1(
+          "Guru Diperbarui", "Berhasil memperbarui data guru");
     } catch (e) {
       GetDialogs.showDialog1(
         "Kesalahan!",
@@ -236,7 +230,8 @@ class AdminController extends GetxController {
               color: ColorConstant.black,
             ),
           ),
-          content: const Text("Data presensi guru juga akan dihapus. Apakah Anda yakin ingin menghapus guru ini?"),
+          content: const Text(
+              "Apakah Anda yakin ingin menghapus guru ini?"),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context, false), // Batal
@@ -256,7 +251,6 @@ class AdminController extends GetxController {
       // Jika pengguna mengkonfirmasi hapus
       if (confirm == true) {
         await firestore.collection('pegawai').doc(username).delete();
-        await firestore.collection('presensi').doc(username).delete();
         await fetchDataGuru();
 
         GetDialogs.showSnackBar1("Guru Dihapus", "Berhasil hapus guru");

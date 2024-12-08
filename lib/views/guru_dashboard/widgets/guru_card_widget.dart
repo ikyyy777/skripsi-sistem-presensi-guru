@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:presensi_guru/constants/color_constant.dart';
 import 'package:presensi_guru/constants/textstyle_constant.dart';
 import 'package:presensi_guru/controllers/guru_controller.dart';
+import 'package:presensi_guru/controllers/login_controller.dart';
 import 'package:presensi_guru/models/presensi_model.dart';
 import 'package:presensi_guru/utils/datetime_getters.dart';
 
@@ -10,6 +11,7 @@ class GuruCardWidget extends StatelessWidget {
   GuruCardWidget({super.key});
 
   final guruController = Get.put(GuruController());
+  final loginController = Get.put(LoginController());
 
   @override
   Widget build(BuildContext context) {
@@ -61,72 +63,80 @@ class GuruCardWidget extends StatelessWidget {
                         ),
                         const SizedBox(height: 5),
                         Obx(() {
-                          return FutureBuilder<PresensiModel?>(
-                            future: guruController
-                                .fetchDataPresensi(), // Mengambil data presensi
+                          return FutureBuilder<Presensi?>(
+                            future: guruController.getDataPresensi(
+                              loginController.loggedUsername.value,
+                              guruController.yearNow,
+                              guruController.monthNow,
+                            ),
                             builder: (context, snapshot) {
                               if (snapshot.hasData) {
-                                PresensiModel presensiModel = snapshot.data!;
-                                // Mendapatkan data tahun dan bulan sekarang
-                                String yearNow = DatetimeGetters.getYearNow();
-                                String monthNow =
-                                    DateTime.now().month.toString();
-                                String monthNowIndo = DatetimeGetters
-                                    .bulanIndo[int.parse(monthNow) - 1];
-                                String todayDate = DatetimeGetters.getFormattedDateTimeNow();
+                                Presensi presensiModel = snapshot.data!;
 
                                 // Mencari data bulan untuk tahun dan bulan sekarang
-                                var yearData =
-                                    presensiModel.presensiData[yearNow];
-                                var monthData = yearData!.firstWhere(
-                                  (month) => month.bulan == monthNowIndo,
-                                  orElse: () => Presensi(
-                                      bulan: monthNowIndo,
-                                      totalHadir: 0,
-                                      totalCuti: 0,
-                                      totalTelat: 0,
-                                      riwayatPresensi: []),
+                                var monthData =
+                                    presensiModel.riwayatPresensi.firstWhere(
+                                  (entry) {
+                                    // Parse tanggalPresensi from format 'Minggu, 8 Desember 2024' to 'yyyy-MM-dd'
+                                    DateTime entryDate =
+                                        DatetimeGetters.parseFormattedDate(
+                                            entry.tanggalPresensi);
+
+                                    // Compare entryDate with the current year and month
+                                    String currentMonthString =
+                                        '${guruController.yearNow}-${guruController.monthNow.toString().padLeft(2, '0')}';
+                                    return '${entryDate.year}-${entryDate.month.toString().padLeft(2, '0')}' ==
+                                        currentMonthString;
+                                  },
+                                  orElse: () => RiwayatPresensi(
+                                    riwayatId: '',
+                                    presensiId: '',
+                                    tanggalPresensi: '',
+                                    jamMasuk: '',
+                                    jamKeluar: null,
+                                    keterangan: 'Belum Absen',
+                                  ),
                                 );
 
-                                if (monthData != null) {
-                                  // Mengecek apakah sudah absen hari ini
-                                  bool isAbsen = monthData.riwayatPresensi.any(
-                                      (entry) =>
-                                          entry.tanggalPresensi == todayDate);
+                                // Mengecek apakah sudah absen hari ini
+                                bool isAbsen = monthData.tanggalPresensi ==
+                                    DatetimeGetters.getFormattedDateTimeNow();
 
-                                  if (isAbsen) {
-                                    // Jika sudah absen, tampilkan jam presensi
-                                    String jamMasuk = monthData.riwayatPresensi
-                                        .firstWhere((entry) =>
-                                            entry.tanggalPresensi == todayDate)
-                                        .jamMasuk;
-                                    return Text(
-                                      jamMasuk,
-                                      style: TextstyleConstant.nunitoSansBold.copyWith(
-                                        color: ColorConstant.white,
-                                        fontSize: 16,
-                                      ),
-                                    );
-                                  } else {
-                                    // Jika belum absen, tampilkan pesan belum presensi
-                                    return Text(
-                                      "Belum Presensi",
-                                      style: TextstyleConstant.nunitoSansBold.copyWith(
-                                        color: ColorConstant.white,
-                                        fontSize: 16,
-                                      ),
-                                    );
-                                  }
+                                if (isAbsen) {
+                                  // Jika sudah absen, tampilkan jam presensi
+                                  return Text(
+                                    monthData.jamMasuk,
+                                    style: TextstyleConstant.nunitoSansBold
+                                        .copyWith(
+                                      color: ColorConstant.white,
+                                      fontSize: 16,
+                                    ),
+                                  );
                                 } else {
-                                  // Jika data bulan tidak ditemukan
-                                  return const Text("");
+                                  // Jika belum absen, tampilkan pesan belum presensi
+                                  return Text(
+                                    "Belum Presensi",
+                                    style: TextstyleConstant.nunitoSansBold
+                                        .copyWith(
+                                      color: ColorConstant.white,
+                                      fontSize: 16,
+                                    ),
+                                  );
                                 }
+                              } else {
+                                // Jika data bulan tidak ditemukan
+                                return Text(
+                                  "Belum Presensi",
+                                  style:
+                                      TextstyleConstant.nunitoSansBold.copyWith(
+                                    color: ColorConstant.white,
+                                    fontSize: 16,
+                                  ),
+                                );
                               }
-
-                              return const Text("");
                             },
                           );
-                        }),
+                        })
                       ],
                     ),
                     VerticalDivider(

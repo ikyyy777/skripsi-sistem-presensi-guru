@@ -11,6 +11,7 @@ import 'package:presensi_guru/views/login/login_view.dart';
 import 'package:presensi_guru/views/splashscreen/splashscreen_view.dart';
 import 'firebase_options.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:intl/date_symbol_data_local.dart'; // Import for locale data initialization
 
 void main() async{
   await dotenv.load(fileName: '.env');
@@ -24,7 +25,9 @@ void main() async{
     DeviceOrientation.portraitDown,
   ]);
 
-  runApp(MyApp());
+  initializeDateFormatting('id_ID', null).then((_) {
+    runApp(MyApp());
+  });
 }
 
 class MyApp extends StatelessWidget {

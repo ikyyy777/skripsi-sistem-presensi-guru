@@ -1,3 +1,5 @@
+import 'package:intl/intl.dart';
+
 class DatetimeGetters {
   static List<String> bulanIndo = [
     'Januari',
@@ -18,9 +20,9 @@ class DatetimeGetters {
     'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu', 'Minggu'
   ];
 
-  static String getYearNow() {
+  static int getYearNow() {
     final now = DateTime.now();
-    return now.year.toString();
+    return now.year;
   }
 
   static String getTimeOfDay() {
@@ -64,5 +66,11 @@ class DatetimeGetters {
 
     // Format tanggal dalam bentuk "Day, Date Month Year"
     return '${now.day} $bulan ${now.year}';
+  }
+
+  static DateTime parseFormattedDate(String dateString) {
+    // Remove the day of the week and parse the rest
+    final dateFormat = DateFormat('d MMMM yyyy', 'id_ID'); // 'id_ID' for Indonesian locale
+    return dateFormat.parse(dateString.split(',')[1].trim());
   }
 }

@@ -12,7 +12,7 @@ class GuruModel {
   final String noHp;
   final String nip;
   final String nuptk;
-  final String imei;
+  final String idPerangkat;
   final DateTime? dibuatPada;
 
   GuruModel({
@@ -27,7 +27,7 @@ class GuruModel {
     required this.noHp,
     required this.nip,
     required this.nuptk,
-    required this.imei,
+    required this.idPerangkat,
     this.dibuatPada,
   });
 
@@ -45,7 +45,7 @@ class GuruModel {
       noHp: data['no_hp'] ?? '',
       nip: data['NIP'] ?? '',
       nuptk: data['NUPTK'] ?? '',
-      imei: data['IMEI'] ?? '',
+      idPerangkat: data['id_perangkat'] ?? '',
       dibuatPada: (data['dibuat_pada'] as Timestamp?)?.toDate(),
     );
   }

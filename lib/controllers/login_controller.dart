@@ -82,23 +82,23 @@ class LoginController extends GetxController {
 
         if (guruData['password'] == inputPassword) {
           // Dapatkan IMEI perangkat
-          String? imei = await getIMEI();
+          String? deviceId = await getIMEI();
 
           // Cek apakah guru pertama kali login
           if (guruData['id_perangkat'] == null || guruData['id_perangkat'] == "") {
-            if (imei != null && imei != 'Permission Denied') {
+            if (deviceId != null && deviceId != 'Permission Denied') {
               // Update IMEI di Firestore
-              guruData['id_perangkat'] = imei;
+              guruData['id_perangkat'] = deviceId;
               await firestore
                   .collection('pegawai')
                   .doc(inputUsername)
-                  .update({'id_perangkat': imei});
+                  .update({'id_perangkat': deviceId});
             }
             Get.back();
             loggedUsername.value = username.text;
             Get.toNamed(Routes.guruDashboardView);
           } else {
-            if (guruData['id_perangkat'] == imei) {
+            if (guruData['id_perangkat'] == deviceId) {
               Get.back();
               loggedUsername.value = username.text;
               Get.toNamed(Routes.guruDashboardView);

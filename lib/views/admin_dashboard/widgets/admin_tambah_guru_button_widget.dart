@@ -28,7 +28,7 @@ class AdminTambahGuruButtonWidget extends StatelessWidget {
               "Tambah Guru",
               style: TextstyleConstant.nunitoSansMedium.copyWith(
                 color: ColorConstant.white,
-                fontSize: 20,
+                fontSize: 18,
               ),
             ),
           ),

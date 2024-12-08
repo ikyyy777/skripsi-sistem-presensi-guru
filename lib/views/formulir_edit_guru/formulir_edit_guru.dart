@@ -26,6 +26,9 @@ class FormulirEditGuru extends StatelessWidget {
     TextEditingController formPassword = TextEditingController(
       text: adminController.daftarGuru[index].password,
     );
+    TextEditingController formIdPerangkat = TextEditingController(
+      text: adminController.daftarGuru[index].idPerangkat,
+    );
 
     // biodata pribadi
     TextEditingController formName = TextEditingController(
@@ -122,6 +125,20 @@ class FormulirEditGuru extends StatelessWidget {
                   validator: (value) {
                     if (value!.isEmpty) {
                       return 'Password tidak boleh kosong';
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 10),
+                CustomGlobalFormField(
+                  adminController: adminController,
+                  title: "ID Perangkat",
+                  value: formIdPerangkat,
+                  hintText: "ID Perangkat",
+                  dataType: 'String',
+                  validator: (value) {
+                    if (value!.isEmpty) {
+                      return null;
                     }
                     return null;
                   },
@@ -292,6 +309,7 @@ class FormulirEditGuru extends StatelessWidget {
                           nip: formNIP.text,
                           nuptk: formNUPTK.text,
                           password: formPassword.text,
+                          idPerangkat: formIdPerangkat.text,
                         );
                         adminController.initPage();
                         Get.back();
@@ -299,10 +317,10 @@ class FormulirEditGuru extends StatelessWidget {
                     },
                     child: Center(
                       child: Text(
-                        "Kirim Formulir",
+                        "Simpan Perubahan",
                         style: TextstyleConstant.nunitoSansMedium.copyWith(
                           color: ColorConstant.white,
-                          fontSize: 20,
+                          fontSize: 18,
                         ),
                       ),
                     ),

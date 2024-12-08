@@ -56,7 +56,7 @@ class FormulirTambahGuruView extends StatelessWidget {
                 const SizedBox(height: 10),
                 CustomGlobalFormField(
                   adminController: adminController,
-                  title: "Nama Pengguna",
+                  title: "Nama Pengguna*",
                   value: adminController.formUsername,
                   hintText: "nama pengguna",
                   dataType: 'String',
@@ -73,7 +73,7 @@ class FormulirTambahGuruView extends StatelessWidget {
                 const SizedBox(height: 10),
                 CustomGlobalFormField(
                   adminController: adminController,
-                  title: "Kata Sandi",
+                  title: "Kata Sandi*",
                   value: adminController.formPassword,
                   hintText: "kata sandi",
                   dataType: 'String',
@@ -98,7 +98,7 @@ class FormulirTambahGuruView extends StatelessWidget {
                 const SizedBox(height: 10),
                 CustomGlobalFormField(
                   adminController: adminController,
-                  title: "Nama Lengkap",
+                  title: "Nama Lengkap*",
                   value: adminController.formName,
                   hintText: "Nama Lengkap",
                   dataType: 'String',
@@ -116,7 +116,7 @@ class FormulirTambahGuruView extends StatelessWidget {
                 const SizedBox(height: 10),
                 GenderGlobalDropdownField(
                   adminController: adminController,
-                  title: "Jenis Kelamin",
+                  title: "Jenis Kelamin*",
                   value: adminController.formGender.text,
                   hintText: "Pilih Jenis Kelamin",
                   dataType: 'String',
@@ -130,9 +130,9 @@ class FormulirTambahGuruView extends StatelessWidget {
                 const SizedBox(height: 10),
                 CustomGlobalFormField(
                   adminController: adminController,
-                  title: "Tempat, Tanggal Lahir",
+                  title: "Tempat, Tanggal Lahir*",
                   value: adminController.formPlaceDateOfBirth,
-                  hintText: "Tempat, Tanggal Lahir",
+                  hintText: "Cilacap, 12 Oktober 2003",
                   dataType: 'String',
                   validator: (value) {
                     if (value!.isEmpty) {
@@ -144,7 +144,7 @@ class FormulirTambahGuruView extends StatelessWidget {
                 const SizedBox(height: 10),
                 CustomGlobalFormField(
                   adminController: adminController,
-                  title: "Agama",
+                  title: "Agama*",
                   value: adminController.formReligion,
                   hintText: "Agama",
                   dataType: 'String',
@@ -158,7 +158,7 @@ class FormulirTambahGuruView extends StatelessWidget {
                 const SizedBox(height: 10),
                 CustomGlobalFormField(
                   adminController: adminController,
-                  title: "Alamat",
+                  title: "Alamat*",
                   value: adminController.formAddress,
                   hintText: "Alamat Lengkap",
                   dataType: 'String',
@@ -172,7 +172,7 @@ class FormulirTambahGuruView extends StatelessWidget {
                 const SizedBox(height: 10),
                 CustomGlobalFormField(
                   adminController: adminController,
-                  title: "Email",
+                  title: "Email*",
                   value: adminController.formEmail,
                   hintText: "Email",
                   dataType: 'String',
@@ -186,9 +186,9 @@ class FormulirTambahGuruView extends StatelessWidget {
                 const SizedBox(height: 10),
                 CustomGlobalFormField(
                   adminController: adminController,
-                  title: "Nomor Telepon",
+                  title: "Nomor Telepon*",
                   value: adminController.formPhoneNumber,
-                  hintText: "Nomor Telepon",
+                  hintText: "0812345678910",
                   dataType: 'int',
                   validator: (value) {
                     if (value!.isEmpty) {
@@ -253,10 +253,10 @@ class FormulirTambahGuruView extends StatelessWidget {
                     },
                     child: Center(
                       child: Text(
-                        "Kirim Formulir",
+                        "Tambahkan Guru",
                         style: TextstyleConstant.nunitoSansMedium.copyWith(
                           color: ColorConstant.white,
-                          fontSize: 20,
+                          fontSize: 18,
                         ),
                       ),
                     ),

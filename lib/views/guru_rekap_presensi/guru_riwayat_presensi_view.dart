@@ -12,7 +12,8 @@ class GuruRiwayatPresensiView extends StatefulWidget {
   const GuruRiwayatPresensiView({super.key});
 
   @override
-  _GuruRiwayatPresensiViewState createState() => _GuruRiwayatPresensiViewState();
+  _GuruRiwayatPresensiViewState createState() =>
+      _GuruRiwayatPresensiViewState();
 }
 
 class _GuruRiwayatPresensiViewState extends State<GuruRiwayatPresensiView> {
@@ -22,13 +23,15 @@ class _GuruRiwayatPresensiViewState extends State<GuruRiwayatPresensiView> {
   @override
   void initState() {
     super.initState();
-    // Log data untuk memastikan jumlah state sesuai dengan jumlah tahun
-    final presensiData = guruController.presensiModel.value?.presensiData ?? {};
+    // Mengambil data riwayat presensi
+    final riwayatPresensiData =
+        guruController.presensiModel.value?.riwayatPresensi ?? [];
     if (kDebugMode) {
-      print("Presensi Data (init): $presensiData");
+      print("Presensi Data (init): $riwayatPresensiData");
     }
 
-    expansionState = List.generate(presensiData.keys.length, (_) => false);
+    // Menginisialisasi expansion state
+    expansionState = List.generate(riwayatPresensiData.length, (_) => false);
   }
 
   @override
@@ -55,8 +58,9 @@ class _GuruRiwayatPresensiViewState extends State<GuruRiwayatPresensiView> {
         ),
       ),
       body: Obx(() {
-        final presensiData = guruController.presensiModel.value?.presensiData;
-        if (presensiData == null || presensiData.isEmpty) {
+        final presensiData = guruController.presensiModel.value;
+        final riwayatPresensiData = presensiData?.riwayatPresensi ?? [];
+        if (riwayatPresensiData.isEmpty) {
           return Center(
             child: Text(
               "Tidak ada data presensi",
@@ -68,25 +72,22 @@ class _GuruRiwayatPresensiViewState extends State<GuruRiwayatPresensiView> {
           );
         }
 
-        // Update jumlah expansionState jika jumlah tahun berubah
-        if (expansionState.length != presensiData.keys.length) {
+        // Mengelompokkan riwayat presensi berdasarkan tahun
+        final groupedByYear = _groupByYearAndMonth(riwayatPresensiData);
+
+        // Update jumlah expansion state jika jumlah tahun berubah
+        if (expansionState.length != groupedByYear.keys.length) {
           setState(() {
-            expansionState = List.generate(
-              presensiData.keys.length,
-              (_) => false,
-            );
+            expansionState =
+                List.generate(groupedByYear.keys.length, (_) => false);
           });
         }
 
         return ListView.builder(
-          itemCount: presensiData.keys.length,
+          itemCount: groupedByYear.keys.length,
           itemBuilder: (context, yearIndex) {
-            String year = presensiData.keys.toList()[yearIndex];
-            List<Presensi> presensiList = presensiData[year]!;
-
-            // Sorting bulan
-            presensiList.sort((a, b) =>
-                _bulanToIndex(b.bulan).compareTo(_bulanToIndex(a.bulan)));
+            final year = groupedByYear.keys.elementAt(yearIndex);
+            final presensiForYear = groupedByYear[year]!;
 
             return ExpansionPanelList(
               expansionCallback: (panelIndex, isExpanded) {
@@ -110,19 +111,24 @@ class _GuruRiwayatPresensiViewState extends State<GuruRiwayatPresensiView> {
                   },
                   isExpanded: expansionState[yearIndex],
                   body: Column(
-                    children: presensiList.map((presensi) {
+                    children: presensiForYear.entries.map((entry) {
+                      final month = entry.key;
+
                       return ListTile(
                         title: Text(
-                          presensi.bulan,
+                          DatetimeGetters.bulanIndo[month - 1],
                           style: TextstyleConstant.nunitoSansMedium.copyWith(
                             fontSize: 14,
-                            color: ColorConstant.black,
+                            color: ColorConstant.black50,
                           ),
                         ),
                         trailing: TextButton(
                           onPressed: () {
-                            // Handle lihat rekap
-                            Get.to(()=> GuruRekapPresensiView(month: presensi.bulan, year: year));
+                            Get.to(() => GuruRekapPresensiView(
+                                  month: month.toString(),
+                                  year: year.toString(),
+                                  //riwayatPresensi: riwayatForMonth,
+                                ));
                           },
                           child: Text(
                             "lihat rekap",
@@ -144,7 +150,28 @@ class _GuruRiwayatPresensiViewState extends State<GuruRiwayatPresensiView> {
     );
   }
 
-  int _bulanToIndex(String bulan) {
-    return DatetimeGetters.bulanIndo.indexOf(bulan);
+  // Fungsi untuk mengelompokkan riwayat presensi berdasarkan tahun dan bulan
+  Map<int, Map<int, List<RiwayatPresensi>>> _groupByYearAndMonth(
+      List<RiwayatPresensi> riwayatPresensi) {
+    final Map<int, Map<int, List<RiwayatPresensi>>> grouped = {};
+    for (var presensi in riwayatPresensi) {
+      // Remove the day of the week (e.g., "Minggu,") and split the rest of the date
+      final dateParts =
+          presensi.tanggalPresensi.split(',')[1].trim().split(' ');
+
+      // Extract the month (as text), and year
+      final monthString = dateParts[1];
+      final year = int.parse(dateParts[2]);
+
+      // Convert month string to month number
+      final month = DatetimeGetters.bulanIndo.indexOf(monthString) + 1;
+
+      // Group by year and month
+      grouped
+          .putIfAbsent(year, () => {})
+          .putIfAbsent(month, () => [])
+          .add(presensi);
+    }
+    return grouped;
   }
 }

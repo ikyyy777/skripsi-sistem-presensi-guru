@@ -15,11 +15,15 @@ class GuruController extends GetxController {
   FirebaseFirestore firestore = FirebaseFirestore.instance;
 
   Rx<GuruModel?> dataGuru = Rx<GuruModel?>(null);
-  Rx<PresensiModel?> presensiModel = Rx<PresensiModel?>(null);
+  Rx<Presensi?> presensiModel = Rx<Presensi?>(null);
 
   RxBool isPageLoading = true.obs;
 
   Timer? backgroundTask;
+
+  int yearNow = DatetimeGetters.getYearNow();
+  int monthNow = DateTime.now().month;
+  int dayNow = DateTime.now().day;
 
   @override
   void onInit() {
@@ -35,17 +39,23 @@ class GuruController extends GetxController {
   }
 
   void initPage() async {
+    final loginController = Get.put(LoginController());
+
     isPageLoading.value = true;
     await fetchDataGuru();
-    presensiModel.value = await fetchDataPresensi();
+    presensiModel.value = await getDataPresensi(
+        loginController.loggedUsername.value, yearNow, monthNow);
     isPageLoading.value = false;
   }
 
   void startBackgroundTask() {
+    final loginController = Get.put(LoginController());
+
     backgroundTask =
         Timer.periodic(const Duration(seconds: 1), (Timer timer) async {
       await fetchDataGuru();
-      presensiModel.value = await fetchDataPresensi();
+      presensiModel.value = await getDataPresensi(
+          loginController.loggedUsername.value, yearNow, monthNow);
     });
   }
 
@@ -62,30 +72,44 @@ class GuruController extends GetxController {
     }
   }
 
-  Future<PresensiModel?> fetchDataPresensi() async {
+  Future<Presensi?> getDataPresensi(
+      String username, int year, int month) async {
     try {
-      final loginController = Get.put(LoginController());
-      DocumentReference docRef = firestore
-          .collection('presensi')
-          .doc(loginController.loggedUsername.value);
-      DocumentSnapshot doc = await docRef.get();
+      // Referensi koleksi
+      CollectionReference presensiRef =
+          FirebaseFirestore.instance.collection('presensi');
+      CollectionReference riwayatPresensiRef =
+          FirebaseFirestore.instance.collection('riwayat_presensi');
 
-      if (doc.exists) {
-        // Mengambil data dari Firestore dan mengonversinya ke dalam model
-        Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
-        return PresensiModel.fromMap(
-            loginController.loggedUsername.value, data);
-      } else {
-        // Jika dokumen tidak ada
-        GetDialogs.showDialog1(
-            "Fatal Error", "Dokumen presensi tidak ditemukan pada database");
+      // ID presensi
+      String presensiId = "${username}_${year}_$month";
+
+      // Query presensi
+      DocumentSnapshot presensiDoc = await presensiRef.doc(presensiId).get();
+      if (!presensiDoc.exists) {
+        log("Data presensi tidak ditemukan untuk ID: $presensiId");
         return null;
       }
+
+      // Ambil data presensi
+      Map<String, dynamic> presensiData =
+          presensiDoc.data() as Map<String, dynamic>;
+
+      // Query riwayat presensi terkait
+      QuerySnapshot riwayatPresensiSnapshot = await riwayatPresensiRef
+          .where('presensi_id', isEqualTo: presensiId)
+          .get();
+
+      // Map riwayat presensi ke model
+      List<RiwayatPresensi> riwayatPresensiList =
+          riwayatPresensiSnapshot.docs.map((doc) {
+        return RiwayatPresensi.fromMap(doc.data() as Map<String, dynamic>);
+      }).toList();
+
+      // Buat model Presensi
+      return Presensi.fromMap(presensiData, riwayatPresensiList);
     } catch (e) {
-      // Menangani error jika terjadi masalah saat mengambil data
-      log(e.toString());
-      GetDialogs.showDialog1(
-          "Fatal Error", "Terjadi kesalahan saat mengambil data");
+      log("Terjadi kesalahan saat mengambil data presensi: $e");
       return null;
     }
   }
@@ -123,146 +147,90 @@ class GuruController extends GetxController {
 
   Future<void> kirimPresensi() async {
     try {
-      // if (true) {
-      if (await isConnectedWifiSchool()) {
-        final loginController = Get.put(LoginController());
-        final keterangan = checkTepatWaktu();
-        String yearNow = DatetimeGetters.getYearNow();
-        String monthNow = DateTime.now().month.toString();
-        String monthNowIndo =
-            DatetimeGetters.bulanIndo[int.parse(monthNow) - 1];
-        String todayDate = DatetimeGetters.getFormattedDateTimeNow();
-        String jamMasuk = DateTime.now()
-            .toString()
-            .split(" ")[1]
-            .substring(0, 8); // Get HH-MM-SS
+      final keterangan = checkTepatWaktu();
+      String todayDate = DatetimeGetters.getFormattedDateTimeNow();
+      String jamMasuk = DateTime.now().toString().split(" ")[1].substring(0, 8);
 
-        // Validasi hari Sabtu dan Minggu
-        int todayWeekday = DateTime.now().weekday; // 6 = Sabtu, 7 = Minggu
-        if (todayWeekday == 6 || todayWeekday == 7) {
-          GetDialogs.showDialog1("Maaf",
-              "Presensi tidak dapat dilakukan pada hari Sabtu atau Minggu.");
-          return;
-        }
+      final loginController = Get.put(LoginController());
 
-        DocumentReference docRef = firestore
-            .collection('presensi')
-            .doc(loginController.loggedUsername.value);
-        DocumentSnapshot doc = await docRef.get();
-
-        if (doc.exists) {
-          Map<String, dynamic> presensiData =
-              doc.data() as Map<String, dynamic>;
-
-          // Jika tahun sudah ada
-          if (presensiData.containsKey(yearNow)) {
-            List<dynamic> yearData = presensiData[yearNow];
-            var monthData = yearData.firstWhere(
-                (month) => month['bulan'] == monthNowIndo,
-                orElse: () => null);
-
-            if (monthData != null) {
-              // Cek apakah hari ini sudah presensi
-              bool alreadyPresensi = monthData['riwayat_presensi']
-                  .any((entry) => entry['tanggal_presensi'] == todayDate);
-
-              if (alreadyPresensi) {
-                GetDialogs.showDialog1(
-                    "Maaf", "Kamu cuma bisa presensi satu kali setiap hari");
-                return;
-              }
-
-              // Jika belum presensi, tambahkan riwayat presensi
-              monthData['riwayat_presensi'].add({
-                'keterangan': keterangan,
-                'jam_masuk': jamMasuk,
-                'tanggal_presensi': todayDate
-              });
-
-              // Perbarui total counts
-              if (keterangan == 'ontime') {
-                monthData['total_hadir']++;
-              } else if (keterangan == 'telat') {
-                monthData['total_hadir']++;
-                monthData['total_telat']++;
-              }
-              GetDialogs.showSnackBar1(
-                  "Sukses Presensi", "Terima kasih sudah presensi hari ini");
-              initPage();
-            } else {
-              // Jika bulan belum ada, tambahkan bulan baru
-              yearData.add({
-                'bulan': monthNowIndo,
-                'total_hadir': keterangan == 'ontime' ? 1 : 0,
-                'total_cuti': 0,
-                'total_telat': keterangan == 'telat' ? 1 : 0,
-                'riwayat_presensi': [
-                  {
-                    'keterangan': keterangan,
-                    'jam_masuk': jamMasuk,
-                    'tanggal_presensi': todayDate
-                  }
-                ]
-              });
-              GetDialogs.showSnackBar1(
-                  "Sukses Presensi", "Terima kasih sudah presensi hari ini");
-              initPage();
-            }
-
-            // Update kembali dokumen di Firestore
-            await docRef.update({yearNow: yearData});
-          } else {
-            // Jika tahun belum ada, buat tahun baru
-            await docRef.set({
-              yearNow: [
-                {
-                  'bulan': monthNowIndo,
-                  'total_hadir': keterangan == 'ontime' ? 1 : 0,
-                  'total_cuti': 0,
-                  'total_telat': keterangan == 'telat' ? 1 : 0,
-                  'riwayat_presensi': [
-                    {
-                      'keterangan': keterangan,
-                      'jam_masuk': jamMasuk,
-                      'tanggal_presensi': todayDate
-                    }
-                  ]
-                }
-              ]
-            });
-            GetDialogs.showSnackBar1(
-                "Sukses Presensi", "Terima kasih sudah presensi hari ini");
-            initPage();
-          }
-        } else {
-          // Jika dokumen presensi belum ada, buat dokumen baru
-          await docRef.set({
-            yearNow: [
-              {
-                'bulan': monthNowIndo,
-                'total_hadir': keterangan == 'ontime' ? 1 : 0,
-                'total_cuti': 0,
-                'total_telat': keterangan == 'telat' ? 1 : 0,
-                'riwayat_presensi': [
-                  {
-                    'keterangan': keterangan,
-                    'jam_masuk': jamMasuk,
-                    'tanggal_presensi': todayDate
-                  }
-                ]
-              }
-            ]
-          });
-          GetDialogs.showSnackBar1(
-              "Sukses Presensi", "Terima kasih sudah presensi hari ini");
-          initPage();
-        }
-      } else {
-        GetDialogs.showDialog1(
-            "Gagal Presensi", "Kamu tidak terhubung ke jaringan sekolah!");
+      // Validasi hari Sabtu dan Minggu
+      int todayWeekday = DateTime.now().weekday; // 6 = Sabtu, 7 = Minggu
+      if (todayWeekday == 6 || todayWeekday == 7) {
+        GetDialogs.showDialog1("Maaf",
+            "Presensi tidak dapat dilakukan pada hari Sabtu atau Minggu.");
+        return;
       }
+
+      String presensiId =
+          "${loginController.loggedUsername}_${yearNow}_$monthNow";
+      String riwayatId =
+          "${loginController.loggedUsername}_${yearNow}_${monthNow}_$dayNow";
+
+      // Check if user already has attendance for today
+      QuerySnapshot riwayatData = await firestore
+          .collection('riwayat_presensi')
+          .where('riwayat_id', isEqualTo: riwayatId)
+          .get();
+
+      if (riwayatData.docs.isNotEmpty) {
+        // Show dialog if already marked attendance today
+        GetDialogs.showDialog1(
+            "Gagal Presensi", "Presensi hanya bisa dilakukan sekali per hari.");
+        return;
+      }
+
+      // Check if presensi document exists
+      QuerySnapshot presensiData = await firestore
+          .collection('presensi')
+          .where('presensi_id', isEqualTo: presensiId)
+          .get();
+
+      if (presensiData.docs.isEmpty) {
+        // If presensi document doesn't exist, create it
+        await firestore.collection('presensi').doc(presensiId).set({
+          "presensi_id": presensiId,
+          "username": loginController.loggedUsername.value,
+          "tahun": yearNow,
+          "bulan": monthNow,
+          "total_hadir": 1,
+          "total_cuti": 0,
+          "total_telat": 0,
+        });
+      } else {
+        // If presensi document exists, update total_hadir or total_telat
+        DocumentSnapshot presensiDoc = presensiData.docs.first;
+        int totalHadir = presensiDoc['total_hadir'];
+        int totalTelat = presensiDoc['total_telat'];
+
+        // Update the total_hadir or total_telat based on keterangan (if needed)
+        if (keterangan == "Hadir") {
+          totalHadir++;
+        } else if (keterangan == "Telat") {
+          totalTelat++;
+        }
+
+        await firestore.collection('presensi').doc(presensiId).update({
+          "total_hadir": totalHadir,
+          "total_telat": totalTelat,
+        });
+      }
+
+      // Tambah dokumen baru ke koleksi "riwayat_presensi"
+      await firestore.collection('riwayat_presensi').doc(riwayatId).set({
+        "riwayat_id": riwayatId,
+        "presensi_id": presensiId,
+        "tanggal_presensi": todayDate,
+        "jam_masuk": jamMasuk,
+        "keterangan": keterangan,
+      });
+
+      GetDialogs.showSnackBar1(
+          "Sukses Presensi", "Terima kasih sudah presensi");
+      initPage();
     } catch (e) {
       log(e.toString());
+      GetDialogs.showDialog1(
+          "Gagal Presensi", "Terjadi kesalahan, coba lagi nanti.");
     }
   }
 }

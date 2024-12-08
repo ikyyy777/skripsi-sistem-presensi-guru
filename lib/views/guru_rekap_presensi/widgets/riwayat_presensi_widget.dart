@@ -11,22 +11,6 @@ class RiwayatPresensiWidget extends StatelessWidget {
   final guruController = Get.put(GuruController());
   final String month;
 
-  Presensi get monthPresensi {
-    // Extract the monthPresensi logic into a getter
-    return guruController.presensiModel.value!.presensiData.values
-        .expand((yearData) => yearData)
-        .firstWhere(
-          (presensi) => presensi.bulan == month,
-          orElse: () => Presensi(
-            bulan: month,
-            totalHadir: 0,
-            totalCuti: 0,
-            totalTelat: 0,
-            riwayatPresensi: [],
-          ),
-        );
-  }
-
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -41,9 +25,11 @@ class RiwayatPresensiWidget extends StatelessWidget {
         ),
         const SizedBox(height: 20),
         Obx(() {
-          int totalPresensi = monthPresensi.riwayatPresensi.length;
+          // Access the observable data inside Obx
+          final riwayatPresensiData = guruController.presensiModel.value;
 
-          if (totalPresensi == 0) {
+          // Check if the list is empty
+          if (riwayatPresensiData!.riwayatPresensi.isEmpty) {
             return Center(
               child: Text(
                 "Tidak ada data presensi",
@@ -57,11 +43,11 @@ class RiwayatPresensiWidget extends StatelessWidget {
             return ListView.builder(
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
-              itemCount: totalPresensi,
+              itemCount: riwayatPresensiData.riwayatPresensi.length,
               itemBuilder: (BuildContext context, int index) {
-                // Ambil data riwayat presensi pada bulan ini, dibalik urutannya
+                // Accessing reversed list outside of itemBuilder to improve performance
                 var presensiItem =
-                    monthPresensi.riwayatPresensi.reversed.toList()[index];
+                    riwayatPresensiData.riwayatPresensi.reversed.toList()[index];
 
                 return Container(
                   margin: const EdgeInsets.only(bottom: 20),
