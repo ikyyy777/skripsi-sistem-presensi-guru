@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:presensi_guru/utils/routes.dart';
 import 'package:presensi_guru/views/admin_dashboard/admin_dashboard_view.dart';
+import 'package:presensi_guru/views/admin_lihat_rekap_presensi/admin_lihat_rekap_presensi_view.dart';
 import 'package:presensi_guru/views/formulir_tambah_guru/formulir_tambah_guru_view.dart';
 import 'package:presensi_guru/views/guru_dashboard/guru_dashboard_view.dart';
 import 'package:presensi_guru/views/guru_rekap_presensi/guru_riwayat_presensi_view.dart';
@@ -26,7 +27,7 @@ void main() async{
   ]);
 
   initializeDateFormatting('id_ID', null).then((_) {
-    runApp(MyApp());
+    runApp(const MyApp());
   });
 }
 
@@ -61,6 +62,10 @@ class MyApp extends StatelessWidget {
         GetPage(
           name: Routes.guruRiwayatPresensiView,
           page: () => GuruRiwayatPresensiView(),
+        ),
+        GetPage(
+          name: Routes.adminLihatRekapPresensiView,
+          page: () => AdminLihatRekapPresensiView(),
         ),
       ],
     );
