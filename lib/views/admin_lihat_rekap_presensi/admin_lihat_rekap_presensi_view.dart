@@ -188,9 +188,165 @@ class _AdminLihatRekapPresensiViewState extends State<AdminLihatRekapPresensiVie
                             ),
                           ],
                         ),
-
+                        const SizedBox(height: 10),
                         // Implementasi daftar guru untuk melihat data presensi
-                        Text("Example Text"),
+                        Padding(
+                          padding: const EdgeInsets.all(16),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                "Daftar Guru",
+                                style: TextstyleConstant.nunitoSansBold.copyWith(
+                                  color: ColorConstant.black,
+                                  fontSize: 14,
+                                ),
+                              ),
+                              Divider(
+                                color: ColorConstant.grayBorder,
+                                thickness: 1,
+                              ),
+                              ListView.builder(
+                                shrinkWrap: true,
+                                physics: const NeverScrollableScrollPhysics(),
+                                itemCount: adminController.daftarGuru.length,
+                                itemBuilder: (BuildContext context, int index) {
+                                  final guru = adminController.daftarGuru[index];
+                                  return ListTile(
+                                    contentPadding: EdgeInsets.zero,
+                                    leading: const Icon(Icons.person),
+                                    title: Text(
+                                      guru.nama,
+                                      style: TextstyleConstant.nunitoSansMedium.copyWith(
+                                        fontSize: 14,
+                                        color: ColorConstant.black,
+                                      ),
+                                    ),
+                                    subtitle: Text("NIP ${guru.nip}"),
+                                    trailing: Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        GestureDetector(
+                                          onTap: () {
+                                            showDialog(
+                                              context: context,
+                                              builder: (BuildContext context) {
+                                                String? selectedOption;
+                                                TextEditingController alasanController = TextEditingController();
+
+                                                return StatefulBuilder(
+                                                  builder: (context, setState) {
+                                                    return AlertDialog(
+                                                      title: Text(
+                                                        "Presensi Manual",
+                                                        style: TextstyleConstant.nunitoSansBold.copyWith(
+                                                          color: ColorConstant.black,
+                                                          fontSize: 14,
+                                                        ),
+                                                      ),
+                                                      content: Column(
+                                                        mainAxisSize: MainAxisSize.min,
+                                                        children: [
+                                                          DropdownButtonFormField<String>(
+                                                            decoration: InputDecoration(
+                                                              labelText: "Pilih Kehadiran",
+                                                              labelStyle: TextstyleConstant.nunitoSansMedium,
+                                                              border: OutlineInputBorder(
+                                                                borderSide: BorderSide(color: ColorConstant.grayBorder),
+                                                              ),
+                                                            ),
+                                                            style: TextstyleConstant.nunitoSansMedium,
+                                                            items: ["Cuti", "Hadir"].map((String value) {
+                                                              return DropdownMenuItem<String>(
+                                                                value: value,
+                                                                child: Text(
+                                                                  value,
+                                                                  style: TextstyleConstant.nunitoSansMedium.copyWith(
+                                                                    color: ColorConstant.black,
+                                                                  ),
+                                                                ),
+                                                              );
+                                                            }).toList(),
+                                                            onChanged: (newValue) {
+                                                              setState(() {
+                                                                selectedOption = newValue;
+                                                              });
+                                                            },
+                                                          ),
+                                                          if (selectedOption == "Cuti")
+                                                            Padding(
+                                                              padding: const EdgeInsets.only(top: 16.0),
+                                                              child: TextFormField(
+                                                                controller: alasanController,
+                                                                style: TextstyleConstant.nunitoSansMedium,
+                                                                decoration: InputDecoration(
+                                                                  labelText: "Alasan",
+                                                                  labelStyle: TextstyleConstant.nunitoSansMedium,
+                                                                  border: OutlineInputBorder(
+                                                                    borderSide: BorderSide(color: ColorConstant.grayBorder),
+                                                                  ),
+                                                                ),
+                                                              ),
+                                                            ),
+                                                        ],
+                                                      ),
+                                                      actions: [
+                                                        TextButton(
+                                                          onPressed: () {
+                                                            Navigator.of(context).pop();
+                                                          },
+                                                          child: Text(
+                                                            "Batal",
+                                                            style: TextstyleConstant.nunitoSansMedium.copyWith(
+                                                              color: ColorConstant.black,
+                                                            ),
+                                                          ),
+                                                        ),
+                                                        TextButton(
+                                                          onPressed: () {
+                                                            if (selectedOption == "Cuti") {
+                                                              adminController.kirimCutiManual(guru.username, DateTime.now().toString(), "Cuti ${alasanController.text}");
+                                                            }
+                                                            Navigator.of(context).pop();
+                                                          },
+                                                          child: Text(
+                                                            "OK",
+                                                            style: TextstyleConstant.nunitoSansMedium.copyWith(
+                                                              color: ColorConstant.blue,
+                                                            ),
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    );
+                                                  },
+                                                );
+                                              },
+                                            );
+                                          },
+                                          child: const Icon(
+                                            Icons.my_library_books_rounded,
+                                            size: 24,
+                                          ),
+                                        ),
+                                        const SizedBox(width: 10),
+                                        GestureDetector(
+                                          onTap: () {
+                                            // Aksi untuk mengedit guru
+                                            //Get.to(() => FormulirEditGuru(index: index));
+                                          },
+                                          child: const Icon(
+                                            Icons.edit, // Ikon untuk mengedit
+                                            size: 24,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  );
+                                },
+                              ),
+                            ],
+                          ),
+                        ),
                       ],
                     );
                   },

@@ -17,12 +17,13 @@ import 'package:presensi_guru/utils/datetime_getters.dart';
 import 'package:presensi_guru/utils/get_dialogs.dart';
 import 'package:open_file/open_file.dart';
 
+/// Controller untuk mengelola fungsi-fungsi admin
 class AdminController extends GetxController {
-  // akun
+  // Form Controllers untuk akun
   TextEditingController formUsername = TextEditingController();
   TextEditingController formPassword = TextEditingController();
 
-  // biodata pribadi
+  // Form Controllers untuk biodata pribadi
   TextEditingController formName = TextEditingController();
   TextEditingController formGender = TextEditingController();
   TextEditingController formPlaceDateOfBirth = TextEditingController();
@@ -31,16 +32,21 @@ class AdminController extends GetxController {
   TextEditingController formEmail = TextEditingController();
   TextEditingController formPhoneNumber = TextEditingController();
 
-  // data kepegawaian
+  // Form Controllers untuk data kepegawaian
   TextEditingController formNIP = TextEditingController();
   TextEditingController formNUPTK = TextEditingController();
 
+  // Instance Firestore untuk akses database
   FirebaseFirestore firestore = FirebaseFirestore.instance;
+  
+  // List observable untuk menyimpan data guru
   RxList<GuruModel> daftarGuru = <GuruModel>[].obs;
 
+  // Observable values untuk data admin
   RxInt totalGuru = 0.obs;
   RxString deviceId = "".obs;
 
+  // Utility classes
   DatetimeGetters datetimeGetters = DatetimeGetters();
   Timer? backgroundTask;
 
@@ -57,11 +63,13 @@ class AdminController extends GetxController {
     backgroundTask?.cancel();
   }
 
+  /// Inisialisasi halaman admin
   Future<void> initPage() async {
     await fetchAdminCardData();
     await fetchDataGuru();
   }
 
+  /// Memulai background task untuk refresh data secara periodik
   void startBackgroundTask() {
     backgroundTask =
         Timer.periodic(const Duration(seconds: 1), (Timer timer) async {
@@ -69,18 +77,17 @@ class AdminController extends GetxController {
     });
   }
 
+  /// Mengambil data untuk ditampilkan di admin card
   Future<void> fetchAdminCardData() async {
-    // mendapatkan total guru
-    // ambil semua document di pegawai
+    // Mendapatkan total guru
     QuerySnapshot pegawaiCollection =
         await firestore.collection('pegawai').get();
 
-    // Hitung jumlah dokumen
+    // Hitung jumlah dokumen (dikurangi 1 untuk admin)
     int documentCount = pegawaiCollection.docs.length;
-
     totalGuru.value = documentCount - 1;
 
-    // mendapatkan device id ponsel terdaftar
+    // Mendapatkan device id ponsel terdaftar
     DocumentSnapshot adminDoc =
         await firestore.collection("pegawai").doc("admin").get();
     if (adminDoc.exists) {
@@ -92,11 +99,13 @@ class AdminController extends GetxController {
     }
   }
 
+  /// Mengambil data semua guru dari Firestore
   Future<void> fetchDataGuru() async {
     try {
       QuerySnapshot pegawaiCollection =
           await firestore.collection('pegawai').get();
 
+      // Filter dan mapping data guru
       List<GuruModel> fetchedGuru = pegawaiCollection.docs
           .where((doc) => doc.id != "admin") // Skip dokumen "admin"
           .map((doc) => GuruModel.fromDocumentSnapshot(doc))
@@ -112,8 +121,9 @@ class AdminController extends GetxController {
     }
   }
 
+  /// Menambahkan data guru baru ke Firestore
   Future<void> addGuru() async {
-    // Periksa apakah username sudah ada di collection "pegawai"
+    // Cek username duplikat
     QuerySnapshot querySnapshot = await firestore
         .collection('pegawai')
         .where('username', isEqualTo: formUsername.text)
@@ -127,7 +137,7 @@ class AdminController extends GetxController {
       return;
     }
 
-    // Tambah data pegawai ke koleksi "pegawai"
+    // Tambah data guru baru
     await firestore.collection('pegawai').doc(formUsername.text).set({
       'username': formUsername.text,
       'password': formPassword.text,
@@ -160,21 +170,18 @@ class AdminController extends GetxController {
     GetDialogs.showSnackBar1("Guru Ditambahkan", "Berhasil menambah guru");
   }
 
+  /// Mengupdate password admin
   Future<void> updatePassword(String newPassword) async {
     try {
-      // Mendapatkan dokumen admin dari koleksi "pegawai"
       DocumentReference adminDocRef =
           firestore.collection("pegawai").doc("admin");
 
-      // Melakukan update pada field "password"
       await adminDocRef.update({
         'password': newPassword,
       });
 
-      // Tampilkan pesan sukses
       GetDialogs.showSnackBar1("Kata Sandi", "Berhasil mengganti kata sandi");
     } catch (e) {
-      // Tangani error jika terjadi kesalahan saat update password
       GetDialogs.showDialog1(
         "Kesalahan!",
         "Terjadi kesalahan saat memperbarui kata sandi.",
@@ -183,6 +190,7 @@ class AdminController extends GetxController {
     }
   }
 
+  /// Mengupdate data guru yang sudah ada
   Future<void> updateGuru({
     required String username,
     required String nama,
@@ -198,7 +206,6 @@ class AdminController extends GetxController {
     required String idPerangkat,
   }) async {
     try {
-      // Update data guru di collection "Pegawai"
       await firestore.collection('pegawai').doc(username).update({
         'nama': nama,
         'jenis_kelamin': jenisKelamin,
@@ -224,9 +231,10 @@ class AdminController extends GetxController {
     }
   }
 
+  /// Menghapus data guru
   Future<void> deleteGuru(String username, BuildContext context) async {
     try {
-      // Tampilkan dialog konfirmasi menggunakan `showDialog` untuk memastikan hasil `bool` terdeteksi
+      // Dialog konfirmasi penghapusan
       bool? confirm = await showDialog<bool>(
         context: context,
         builder: (context) => AlertDialog(
@@ -237,24 +245,36 @@ class AdminController extends GetxController {
               color: ColorConstant.black,
             ),
           ),
-          content: const Text("Apakah Anda yakin ingin menghapus guru ini?"),
+          content: Text(
+            "Apakah Anda yakin ingin menghapus guru ini?",
+            style: TextstyleConstant.nunitoSansMedium.copyWith(
+              fontSize: 14,
+              color: ColorConstant.black,
+            ),
+          ),
           actions: [
             TextButton(
-              onPressed: () => Navigator.pop(context, false), // Batal
-              child: const Text("Batal"),
+              onPressed: () => Navigator.pop(context, false),
+              child: Text(
+                "Batal",
+                style: TextstyleConstant.nunitoSansMedium.copyWith(
+                  color: ColorConstant.black,
+                ),
+              ),
             ),
             TextButton(
-              onPressed: () => Navigator.pop(context, true), // Hapus
+              onPressed: () => Navigator.pop(context, true),
               child: Text(
                 "Hapus",
-                style: TextStyle(color: ColorConstant.blue),
+                style: TextstyleConstant.nunitoSansMedium.copyWith(
+                  color: ColorConstant.blue,
+                ),
               ),
             ),
           ],
         ),
       );
 
-      // Jika pengguna mengkonfirmasi hapus
       if (confirm == true) {
         await firestore.collection('pegawai').doc(username).delete();
         await fetchDataGuru();
@@ -272,12 +292,13 @@ class AdminController extends GetxController {
     }
   }
 
+  /// Mengambil data rekap presensi untuk periode tertentu
   Future<Map<String, dynamic>> cetakRekapPresensi({
     required int tahun,
     required int bulan,
   }) async {
     try {
-      // 1. Ambil semua guru terlebih dahulu
+      // Ambil data semua guru kecuali admin
       QuerySnapshot guruSnapshot = await firestore
           .collection('pegawai')
           .where(FieldPath.documentId, isNotEqualTo: "admin")
@@ -287,21 +308,20 @@ class AdminController extends GetxController {
 
       Map<String, Map<String, dynamic>> rekapPresensiGuru = {};
 
-      // 2. Loop untuk setiap guru
+      // Loop untuk setiap guru
       for (var guruDoc in guruSnapshot.docs) {
         String username = guruDoc.id;
-        String presensiId = "${username}_${tahun}_$bulan"; // Format presensi ID
+        String presensiId = "${username}_${tahun}_$bulan";
 
-        // Log to check presensiId
         log('Processing presensiId for $username: $presensiId');
 
-        // 3. Ambil data presensi guru
+        // Ambil data presensi guru
         DocumentSnapshot presensiDoc =
             await firestore.collection('presensi').doc(presensiId).get();
 
         log('Presensi document for $username: ${presensiDoc.exists}');
 
-        // 4. Ambil riwayat presensi
+        // Ambil riwayat presensi
         QuerySnapshot riwayatPresensiSnapshot = await firestore
             .collection('riwayat_presensi')
             .where('presensi_id', isEqualTo: presensiId)
@@ -309,10 +329,9 @@ class AdminController extends GetxController {
 
         log('Found ${riwayatPresensiSnapshot.docs.length} riwayat presensi for $username');
 
-        // 5. Susun data rekapitulasi
+        // Susun data rekapitulasi
         Map<String, dynamic> guruData = guruDoc.data() as Map<String, dynamic>;
 
-        // Prepare presensi data (if exists)
         Map<String, dynamic> presensiData = {};
         if (presensiDoc.exists) {
           presensiData = presensiDoc.data() as Map<String, dynamic>;
@@ -328,7 +347,6 @@ class AdminController extends GetxController {
                     })
                 .toList();
 
-        // Populate the rekapPresensiGuru map
         log('Inserting data for $username');
         rekapPresensiGuru[username] = {
           'nama_guru': guruData['nama'],
@@ -341,7 +359,6 @@ class AdminController extends GetxController {
         };
       }
 
-      // Return the result
       return {
         'periode': {
           'tahun': tahun,
@@ -355,6 +372,7 @@ class AdminController extends GetxController {
     }
   }
 
+  /// Request permission untuk akses storage
   Future<void> requestStoragePermission() async {
     if (await Permission.manageExternalStorage.isDenied) {
       await Permission.manageExternalStorage.request();
@@ -365,6 +383,7 @@ class AdminController extends GetxController {
     }
   }
 
+  /// Export data rekap presensi ke Excel
   Future<void> exportToExcel(Map<String, dynamic> rekapData) async {
     try {
       await requestStoragePermission();
@@ -372,46 +391,41 @@ class AdminController extends GetxController {
       var excel = Excel.createExcel();
       Sheet sheet = excel['Sheet1'];
 
-      // Dapatkan semua tanggal dalam bulan tersebut
+      // Setup data periode
       int tahun = rekapData['periode']['tahun'];
       int bulan = rekapData['periode']['bulan'];
       int jumlahHari = DateTime(tahun, bulan + 1, 0).day;
 
-      // Buat header dasar
+      // Setup headers
       List<dynamic> headers = ['Username', 'Nama Guru', 'Total Hadir', 'Total Telat', 'Total Cuti'];
       
-      // List untuk menyimpan tanggal kerja (Senin-Jumat)
       List<DateTime> tanggalKerja = [];
       
-      // Tambahkan hanya tanggal kerja (Senin-Jumat) ke header
+      // Tambah tanggal kerja ke header (Senin-Jumat)
       for (int i = 1; i <= jumlahHari; i++) {
         DateTime tanggal = DateTime(tahun, bulan, i);
-        // 6 = Sabtu, 7 = Minggu
         if (tanggal.weekday < 6) {
           tanggalKerja.add(tanggal);
           headers.add('${tanggal.day}/${bulan.toString().padLeft(2, '0')}/$tahun');
         }
       }
 
-      // Tambahkan headers ke Excel
       sheet.appendRow(headers.map((header) => TextCellValue(header)).toList());
 
-      // Tambahkan data rows
+      // Tambah data rows
       rekapData['rekap_presensi'].forEach((username, data) {
         List<dynamic> rowData = [];
         
-        // Data dasar guru
         rowData.add(TextCellValue(username));
         rowData.add(TextCellValue(data['nama_guru']));
         rowData.add(IntCellValue(data['presensi']['total_hadir'] ?? 0));
         rowData.add(IntCellValue(data['presensi']['total_telat'] ?? 0));
         rowData.add(IntCellValue(data['presensi']['total_cuti'] ?? 0));
 
-        // Buat Map untuk menyimpan presensi per tanggal
         Map<String, String> presensiPerTanggal = {};
         List riwayatPresensi = data['riwayat_presensi'];
 
-        // Isi Map dengan data presensi
+        // Mapping data presensi per tanggal
         for (var riwayat in riwayatPresensi) {
           String tanggalRaw = riwayat['tanggal_presensi'];
           List<String> parts = tanggalRaw.split(', ')[1].split(' ');
@@ -442,17 +456,16 @@ class AdminController extends GetxController {
           presensiPerTanggal[tanggalKey] = '$jamMasuk $keterangan';
         }
 
-        // Tambahkan data presensi hanya untuk tanggal kerja
+        // Tambah data presensi untuk tanggal kerja
         for (DateTime tanggal in tanggalKerja) {
           String tanggalKey = '${tanggal.day}/${bulan.toString().padLeft(2, '0')}/$tahun';
           rowData.add(TextCellValue(presensiPerTanggal[tanggalKey] ?? '-'));
         }
         
-        // Tambahkan row ke Excel
         sheet.appendRow(rowData.map((cell) => cell as CellValue).toList());
       });
 
-      // Generate file name
+      // Generate nama file
       String timestamp =
           DateTime.now().toString().replaceAll(RegExp(r'[^0-9]'), '');
       String fileName = 'rekap_presensi_$timestamp.xlsx';
@@ -460,7 +473,7 @@ class AdminController extends GetxController {
 
       List<int>? excelBytes = excel.encode();
       if (excelBytes != null) {
-        // Create "Rekap Presensi" folder in internal storage
+        // Buat folder "Rekap Presensi" di storage
         directory = await getExternalStorageDirectory();
         String newPath = '';
         List<String> folders = directory!.path.split('/');
@@ -477,19 +490,16 @@ class AdminController extends GetxController {
 
         File saveFile = File('${directory.path}/$fileName');
 
-        // close circular loading
         Get.back();
 
-        // create folder if not exists
         if (!await directory.exists()) {
           await directory.create(recursive: true);
         }
 
-        // create file if not exists
         if (await directory.exists()) {
           await saveFile.writeAsBytes(excelBytes);
 
-          // Show dialog for success
+          // Dialog sukses
           Get.dialog(
             AlertDialog(
               title: Text(
@@ -537,6 +547,55 @@ class AdminController extends GetxController {
     } catch (e) {
       log('Error exporting to Excel: $e');
       GetDialogs.showDialog1("Kesalahan", "Gagal menyimpan file Excel: $e");
+    }
+  }
+
+  /// Mengirim data cuti guru
+  Future<void> kirimCutiManual(String username, String tanggalPresensi, String keterangan) async {
+    try {
+      
+      DateTime dateTime = DateTime.parse(tanggalPresensi);
+      String formattedTanggal = DatetimeGetters.getFormattedDateTimeNow();
+      String presensiId = "${username}_${dateTime.year}_${dateTime.month}";
+      String riwayatId = "${presensiId}_${dateTime.day}";
+
+      // Cek duplikasi presensi
+      DocumentSnapshot riwayatDoc = await firestore.collection('riwayat_presensi').doc(riwayatId).get();
+
+      if (riwayatDoc.exists) {
+        GetDialogs.showDialog1('Gagal', 'Data presensi/cuti hari ini sudah ada');
+        return;
+      }
+
+      // Cek dan update dokumen presensi
+      DocumentSnapshot presensiDoc = await firestore.collection('presensi').doc(presensiId).get();
+      
+      if (!presensiDoc.exists) {
+        await firestore.collection('presensi').doc(presensiId).set({
+          'total_cuti': 1,
+          'total_hadir': 0,
+          'total_telat': 0
+        });
+      } else {
+        await firestore.collection('presensi').doc(presensiId).update({
+          'total_cuti': FieldValue.increment(1),
+        });
+      }
+
+      // Simpan riwayat cuti
+      await firestore.collection('riwayat_presensi').doc(riwayatId).set({
+        'riwayat_id': riwayatId,
+        'presensi_id': presensiId,
+        'tanggal_presensi': formattedTanggal,
+        'keterangan': keterangan,
+        'jam_masuk': '-'
+      });
+
+      GetDialogs.showSnackBar1('Berhasil', 'Berhasil mengirim data cuti');
+      
+    } catch (e) {
+      log('Error kirim cuti: $e');
+      GetDialogs.showSnackBar1('Gagal', 'Gagal mengirim data cuti: $e');
     }
   }
 }
