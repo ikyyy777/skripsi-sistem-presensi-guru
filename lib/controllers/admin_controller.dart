@@ -38,7 +38,7 @@ class AdminController extends GetxController {
 
   // Instance Firestore untuk akses database
   FirebaseFirestore firestore = FirebaseFirestore.instance;
-  
+
   // List observable untuk menyimpan data guru
   RxList<GuruModel> daftarGuru = <GuruModel>[].obs;
 
@@ -397,16 +397,23 @@ class AdminController extends GetxController {
       int jumlahHari = DateTime(tahun, bulan + 1, 0).day;
 
       // Setup headers
-      List<dynamic> headers = ['Username', 'Nama Guru', 'Total Hadir', 'Total Telat', 'Total Cuti'];
-      
+      List<dynamic> headers = [
+        'Username',
+        'Nama Guru',
+        'Total Hadir',
+        'Total Telat',
+        'Total Cuti'
+      ];
+
       List<DateTime> tanggalKerja = [];
-      
+
       // Tambah tanggal kerja ke header (Senin-Jumat)
       for (int i = 1; i <= jumlahHari; i++) {
         DateTime tanggal = DateTime(tahun, bulan, i);
         if (tanggal.weekday < 6) {
           tanggalKerja.add(tanggal);
-          headers.add('${tanggal.day}/${bulan.toString().padLeft(2, '0')}/$tahun');
+          headers
+              .add('${tanggal.day}/${bulan.toString().padLeft(2, '0')}/$tahun');
         }
       }
 
@@ -415,7 +422,7 @@ class AdminController extends GetxController {
       // Tambah data rows
       rekapData['rekap_presensi'].forEach((username, data) {
         List<dynamic> rowData = [];
-        
+
         rowData.add(TextCellValue(username));
         rowData.add(TextCellValue(data['nama_guru']));
         rowData.add(IntCellValue(data['presensi']['total_hadir'] ?? 0));
@@ -429,28 +436,13 @@ class AdminController extends GetxController {
         for (var riwayat in riwayatPresensi) {
           String tanggalRaw = riwayat['tanggal_presensi'];
           List<String> parts = tanggalRaw.split(', ')[1].split(' ');
-          
-          Map<String, String> bulanMap = {
-            'Januari': '01',
-            'Februari': '02',
-            'Maret': '03',
-            'April': '04',
-            'Mei': '05',
-            'Juni': '06',
-            'Juli': '07',
-            'Agustus': '08',
-            'September': '09',
-            'Oktober': '10',
-            'November': '11',
-            'Desember': '12',
-          };
-          
+
           String tanggal = parts[0];
-          String bulanAngka = bulanMap[parts[1]] ?? '01';
+          String bulanAngka = DatetimeGetters.bulanIndoInt[parts[1]] ?? '01';
           String tahun = parts[2];
-          
+
           String tanggalKey = '$tanggal/$bulanAngka/$tahun';
-          
+
           String keterangan = riwayat['keterangan'];
           String jamMasuk = riwayat['jam_masuk'];
           presensiPerTanggal[tanggalKey] = '$jamMasuk $keterangan';
@@ -458,10 +450,11 @@ class AdminController extends GetxController {
 
         // Tambah data presensi untuk tanggal kerja
         for (DateTime tanggal in tanggalKerja) {
-          String tanggalKey = '${tanggal.day}/${bulan.toString().padLeft(2, '0')}/$tahun';
+          String tanggalKey =
+              '${tanggal.day}/${bulan.toString().padLeft(2, '0')}/$tahun';
           rowData.add(TextCellValue(presensiPerTanggal[tanggalKey] ?? '-'));
         }
-        
+
         sheet.appendRow(rowData.map((cell) => cell as CellValue).toList());
       });
 
@@ -551,48 +544,73 @@ class AdminController extends GetxController {
   }
 
   /// Mengirim data cuti guru
-  Future<void> kirimCutiManual(String username, String tanggalPresensi, String keterangan) async {
+  Future<void> kirimPresensiManual(
+      String username, String tanggalPresensi, String keterangan) async {
     try {
-      
       DateTime dateTime = DateTime.parse(tanggalPresensi);
       String formattedTanggal = DatetimeGetters.getFormattedDateTimeNow();
       String presensiId = "${username}_${dateTime.year}_${dateTime.month}";
       String riwayatId = "${presensiId}_${dateTime.day}";
 
       // Cek duplikasi presensi
-      DocumentSnapshot riwayatDoc = await firestore.collection('riwayat_presensi').doc(riwayatId).get();
+      DocumentSnapshot riwayatDoc =
+          await firestore.collection('riwayat_presensi').doc(riwayatId).get();
 
       if (riwayatDoc.exists) {
-        GetDialogs.showDialog1('Gagal', 'Data presensi/cuti hari ini sudah ada');
+        GetDialogs.showDialog1('Gagal', 'Data presensi hari ini sudah ada');
         return;
       }
+      if (keterangan == "Hadir") {
+        // Cek dan update dokumen presensi
+        DocumentSnapshot presensiDoc =
+            await firestore.collection('presensi').doc(presensiId).get();
 
-      // Cek dan update dokumen presensi
-      DocumentSnapshot presensiDoc = await firestore.collection('presensi').doc(presensiId).get();
-      
-      if (!presensiDoc.exists) {
-        await firestore.collection('presensi').doc(presensiId).set({
-          'total_cuti': 1,
-          'total_hadir': 0,
-          'total_telat': 0
+        if (!presensiDoc.exists) {
+          await firestore
+              .collection('presensi')
+              .doc(presensiId)
+              .set({'total_hadir': 1, 'total_cuti': 0, 'total_telat': 0});
+        } else {
+          await firestore.collection('presensi').doc(presensiId).update({
+            'total_hadir': FieldValue.increment(1),
+          });
+        }
+
+        // Simpan riwayat presensi
+        await firestore.collection('riwayat_presensi').doc(riwayatId).set({
+          'riwayat_id': riwayatId,
+          'presensi_id': presensiId,
+          'tanggal_presensi': formattedTanggal,
+          'keterangan': keterangan,
+          'jam_masuk': '-'
         });
       } else {
-        await firestore.collection('presensi').doc(presensiId).update({
-          'total_cuti': FieldValue.increment(1),
+        // Cek dan update dokumen presensi
+        DocumentSnapshot presensiDoc =
+            await firestore.collection('presensi').doc(presensiId).get();
+
+        if (!presensiDoc.exists) {
+          await firestore
+              .collection('presensi')
+              .doc(presensiId)
+              .set({'total_cuti': 1, 'total_hadir': 0, 'total_telat': 0});
+        } else {
+          await firestore.collection('presensi').doc(presensiId).update({
+            'total_cuti': FieldValue.increment(1),
+          });
+        }
+
+        // Simpan riwayat presensi cuti
+        await firestore.collection('riwayat_presensi').doc(riwayatId).set({
+          'riwayat_id': riwayatId,
+          'presensi_id': presensiId,
+          'tanggal_presensi': formattedTanggal,
+          'keterangan': keterangan,
+          'jam_masuk': '-'
         });
+
+        GetDialogs.showSnackBar1('Berhasil', 'Berhasil mengirim data cuti');
       }
-
-      // Simpan riwayat cuti
-      await firestore.collection('riwayat_presensi').doc(riwayatId).set({
-        'riwayat_id': riwayatId,
-        'presensi_id': presensiId,
-        'tanggal_presensi': formattedTanggal,
-        'keterangan': keterangan,
-        'jam_masuk': '-'
-      });
-
-      GetDialogs.showSnackBar1('Berhasil', 'Berhasil mengirim data cuti');
-      
     } catch (e) {
       log('Error kirim cuti: $e');
       GetDialogs.showSnackBar1('Gagal', 'Gagal mengirim data cuti: $e');

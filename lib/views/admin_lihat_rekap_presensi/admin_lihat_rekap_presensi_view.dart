@@ -127,6 +127,7 @@ class _AdminLihatRekapPresensiViewState extends State<AdminLihatRekapPresensiVie
                     return Column(
                       children: [
                         ExpansionPanelList(
+                          expandIconColor: ColorConstant.white,
                           expansionCallback: (panelIndex, isExpanded) {
                             setState(() {
                               expansionState[yearIndex] = isExpanded;
@@ -134,13 +135,13 @@ class _AdminLihatRekapPresensiViewState extends State<AdminLihatRekapPresensiVie
                           },
                           children: [
                             ExpansionPanel(
-                              backgroundColor: ColorConstant.white,
+                              backgroundColor: ColorConstant.blue,
                               headerBuilder: (context, isExpanded) {
                                 return ListTile(
                                   title: Text(
                                     "Data Presensi Tahun $year",
                                     style: TextstyleConstant.nunitoSansBold.copyWith(
-                                      color: ColorConstant.black,
+                                      color: ColorConstant.white,
                                       fontSize: 14,
                                     ),
                                   ),
@@ -154,10 +155,15 @@ class _AdminLihatRekapPresensiViewState extends State<AdminLihatRekapPresensiVie
                                       DatetimeGetters.bulanIndo[month - 1],
                                       style: TextstyleConstant.nunitoSansMedium.copyWith(
                                         fontSize: 14,
-                                        color: ColorConstant.black50,
+                                        color: ColorConstant.white,
                                       ),
                                     ),
                                     trailing: TextButton(
+                                      style: TextButton.styleFrom(
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(90),
+                                        ),
+                                      ),
                                       onPressed: () async {
                                         try {
                                           final rekapData = await adminController
@@ -174,12 +180,9 @@ class _AdminLihatRekapPresensiViewState extends State<AdminLihatRekapPresensiVie
                                           );
                                         }
                                       },
-                                      child: Text(
-                                        "cetak rekap",
-                                        style: TextstyleConstant.nunitoSansMedium.copyWith(
-                                          fontSize: 14,
-                                          color: ColorConstant.blue,
-                                        ),
+                                      child: Icon(
+                                        Icons.print,
+                                        color: ColorConstant.white,
                                       ),
                                     ),
                                   );
@@ -196,7 +199,7 @@ class _AdminLihatRekapPresensiViewState extends State<AdminLihatRekapPresensiVie
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                "Daftar Guru",
+                                "Daftar Presensi Guru",
                                 style: TextstyleConstant.nunitoSansBold.copyWith(
                                   color: ColorConstant.black,
                                   fontSize: 14,
@@ -232,7 +235,7 @@ class _AdminLihatRekapPresensiViewState extends State<AdminLihatRekapPresensiVie
                                               context: context,
                                               builder: (BuildContext context) {
                                                 String? selectedOption;
-                                                TextEditingController alasanController = TextEditingController();
+                                                TextEditingController keteranganController = TextEditingController();
 
                                                 return StatefulBuilder(
                                                   builder: (context, setState) {
@@ -277,10 +280,10 @@ class _AdminLihatRekapPresensiViewState extends State<AdminLihatRekapPresensiVie
                                                             Padding(
                                                               padding: const EdgeInsets.only(top: 16.0),
                                                               child: TextFormField(
-                                                                controller: alasanController,
+                                                                controller: keteranganController,
                                                                 style: TextstyleConstant.nunitoSansMedium,
                                                                 decoration: InputDecoration(
-                                                                  labelText: "Alasan",
+                                                                  labelText: "Keterangan",
                                                                   labelStyle: TextstyleConstant.nunitoSansMedium,
                                                                   border: OutlineInputBorder(
                                                                     borderSide: BorderSide(color: ColorConstant.grayBorder),
@@ -305,7 +308,10 @@ class _AdminLihatRekapPresensiViewState extends State<AdminLihatRekapPresensiVie
                                                         TextButton(
                                                           onPressed: () {
                                                             if (selectedOption == "Cuti") {
-                                                              adminController.kirimCutiManual(guru.username, DateTime.now().toString(), "Cuti ${alasanController.text}");
+                                                              adminController.kirimPresensiManual(guru.username, DateTime.now().toString(), "Cuti ${keteranganController.text}");
+                                                            }
+                                                            else if (selectedOption == "Hadir") {
+                                                              adminController.kirimPresensiManual(guru.username, DateTime.now().toString(), "Hadir");
                                                             }
                                                             Navigator.of(context).pop();
                                                           },
