@@ -4,7 +4,8 @@ import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:presensi_guru/utils/routes.dart';
 import 'package:presensi_guru/views/admin_dashboard/admin_dashboard_view.dart';
-import 'package:presensi_guru/views/admin_lihat_rekap_presensi/admin_lihat_rekap_presensi_view.dart';
+import 'package:presensi_guru/views/admin_lihat_presensi_guru/admin_lihat_presensi_guru_view.dart';
+import 'package:presensi_guru/views/admin_rekap_presensi/admin_rekap_presensi_view.dart';
 import 'package:presensi_guru/views/admin_formulir_tambah_guru/admin_formulir_tambah_guru_view.dart';
 import 'package:presensi_guru/views/guru_dashboard/guru_dashboard_view.dart';
 import 'package:presensi_guru/views/guru_rekap_presensi/guru_riwayat_presensi_view.dart';
@@ -65,7 +66,7 @@ class MyApp extends StatelessWidget {
         ),
         GetPage(
           name: Routes.adminLihatRekapPresensiView,
-          page: () => AdminLihatRekapPresensiView(),
+          page: () => AdminRekapPresensiView(),
         ),
       ],
     );

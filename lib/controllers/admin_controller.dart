@@ -13,6 +13,7 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:presensi_guru/constants/color_constant.dart';
 import 'package:presensi_guru/constants/textstyle_constant.dart';
 import 'package:presensi_guru/models/guru_model.dart';
+import 'package:presensi_guru/models/presensi_model.dart';
 import 'package:presensi_guru/utils/datetime_getters.dart';
 import 'package:presensi_guru/utils/get_dialogs.dart';
 import 'package:open_file/open_file.dart';
@@ -39,7 +40,7 @@ class AdminController extends GetxController {
   // Instance Firestore untuk akses database
   FirebaseFirestore firestore = FirebaseFirestore.instance;
 
-  // List observable untuk menyimpan data guru
+  // List observable untuk menyimpan data guru dalam bentuk list
   RxList<GuruModel> daftarGuru = <GuruModel>[].obs;
 
   // Observable values untuk data admin
@@ -49,6 +50,14 @@ class AdminController extends GetxController {
   // Utility classes
   DatetimeGetters datetimeGetters = DatetimeGetters();
   Timer? backgroundTask;
+  
+  // Variabel untuk periode
+  int yearNow = DatetimeGetters.getYearNow();
+  int monthNow = DateTime.now().month;
+  int dayNow = DateTime.now().day;
+
+  // Variable untuk menyimpan data guru yang dipilih
+  Rx<GuruModel?> selectedDataGuru = Rx<GuruModel?>(null);
 
   @override
   void onInit() {
@@ -66,7 +75,7 @@ class AdminController extends GetxController {
   /// Inisialisasi halaman admin
   Future<void> initPage() async {
     await fetchAdminCardData();
-    await fetchDataGuru();
+    await fetchDataGuruList();
   }
 
   /// Memulai background task untuk refresh data secara periodik
@@ -75,6 +84,49 @@ class AdminController extends GetxController {
         Timer.periodic(const Duration(seconds: 1), (Timer timer) async {
       initPage();
     });
+  }
+
+  /// Mengambil data presensi guru
+  Future<Presensi?> getDataPresensiGuru(
+      String username, int year, int month) async {
+    try {
+      // Referensi koleksi
+      CollectionReference presensiRef =
+          FirebaseFirestore.instance.collection('presensi');
+      CollectionReference riwayatPresensiRef =
+          FirebaseFirestore.instance.collection('riwayat_presensi');
+
+      // ID presensi
+      String presensiId = "${username}_${year}_$month";
+
+      // Query presensi
+      DocumentSnapshot presensiDoc = await presensiRef.doc(presensiId).get();
+      if (!presensiDoc.exists) {
+        log("Data presensi tidak ditemukan untuk ID: $presensiId");
+        return null;
+      }
+
+      // Ambil data presensi
+      Map<String, dynamic> presensiData =
+          presensiDoc.data() as Map<String, dynamic>;
+
+      // Query riwayat presensi terkait
+      QuerySnapshot riwayatPresensiSnapshot = await riwayatPresensiRef
+          .where('presensi_id', isEqualTo: presensiId)
+          .get();
+
+      // Map riwayat presensi ke model
+      List<RiwayatPresensi> riwayatPresensiList =
+          riwayatPresensiSnapshot.docs.map((doc) {
+        return RiwayatPresensi.fromMap(doc.data() as Map<String, dynamic>);
+      }).toList();
+
+      // Buat model Presensi
+      return Presensi.fromMap(presensiData, riwayatPresensiList);
+    } catch (e) {
+      log("Terjadi kesalahan saat mengambil data presensi: $e");
+      return null;
+    }
   }
 
   /// Mengambil data untuk ditampilkan di admin card
@@ -100,7 +152,7 @@ class AdminController extends GetxController {
   }
 
   /// Mengambil data semua guru dari Firestore
-  Future<void> fetchDataGuru() async {
+  Future<void> fetchDataGuruList() async {
     try {
       QuerySnapshot pegawaiCollection =
           await firestore.collection('pegawai').get();
@@ -120,6 +172,9 @@ class AdminController extends GetxController {
       log('Error fetching data guru: $e');
     }
   }
+
+  /// Mengambil data presensi guru
+  
 
   /// Menambahkan data guru baru ke Firestore
   Future<void> addGuru() async {
@@ -277,7 +332,7 @@ class AdminController extends GetxController {
 
       if (confirm == true) {
         await firestore.collection('pegawai').doc(username).delete();
-        await fetchDataGuru();
+        await fetchDataGuruList();
 
         GetDialogs.showSnackBar1("Guru Dihapus", "Berhasil hapus guru");
       } else {
@@ -617,6 +672,18 @@ class AdminController extends GetxController {
     } catch (e) {
       log('Error kirim cuti: $e');
       GetDialogs.showSnackBar1('Gagal', 'Gagal mengirim data cuti: $e');
+    }
+  }
+
+  Future<void> fetchDataGuru(String username) async {
+    try {
+      DocumentSnapshot doc = await firestore
+          .collection('pegawai')
+          .doc(username)
+          .get();
+      selectedDataGuru.value = GuruModel.fromDocumentSnapshot(doc);
+    } catch (e) {
+      log(e.toString());
     }
   }
 }

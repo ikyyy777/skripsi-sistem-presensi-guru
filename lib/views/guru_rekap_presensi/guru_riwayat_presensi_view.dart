@@ -92,6 +92,7 @@ class _GuruRiwayatPresensiViewState extends State<GuruRiwayatPresensiView> {
             final presensiForYear = groupedByYear[year]!;
 
             return ExpansionPanelList(
+              expandIconColor: ColorConstant.white,
               expansionCallback: (panelIndex, isExpanded) {
                 setState(() {
                   expansionState[yearIndex] = isExpanded;
@@ -99,13 +100,13 @@ class _GuruRiwayatPresensiViewState extends State<GuruRiwayatPresensiView> {
               },
               children: [
                 ExpansionPanel(
-                  backgroundColor: ColorConstant.white,
+                  backgroundColor: ColorConstant.blue,
                   headerBuilder: (context, isExpanded) {
                     return ListTile(
                       title: Text(
                         "Data Presensi Tahun $year",
                         style: TextstyleConstant.nunitoSansBold.copyWith(
-                          color: ColorConstant.black,
+                          color: ColorConstant.white,
                           fontSize: 14,
                         ),
                       ),
@@ -121,23 +122,20 @@ class _GuruRiwayatPresensiViewState extends State<GuruRiwayatPresensiView> {
                           DatetimeGetters.bulanIndo[month - 1],
                           style: TextstyleConstant.nunitoSansMedium.copyWith(
                             fontSize: 14,
-                            color: ColorConstant.black50,
+                            color: ColorConstant.white,
                           ),
                         ),
-                        trailing: TextButton(
-                          onPressed: () {
+                        trailing: GestureDetector(
+                          onTap: () {
                             Get.to(() => GuruRekapPresensiView(
                                   month: month.toString(),
                                   year: year.toString(),
                                   //riwayatPresensi: riwayatForMonth,
                                 ));
                           },
-                          child: Text(
-                            "lihat rekap",
-                            style: TextstyleConstant.nunitoSansMedium.copyWith(
-                              fontSize: 14,
-                              color: ColorConstant.blue,
-                            ),
+                          child: Icon(
+                            Icons.date_range_outlined,
+                            color: ColorConstant.white,
                           ),
                         ),
                       );

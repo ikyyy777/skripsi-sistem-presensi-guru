@@ -8,15 +8,16 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:presensi_guru/controllers/admin_controller.dart';
 import 'package:presensi_guru/utils/datetime_getters.dart';
 import 'package:presensi_guru/utils/get_dialogs.dart';
+import 'package:presensi_guru/views/admin_lihat_presensi_guru/admin_lihat_presensi_guru_view.dart';
 
-class AdminLihatRekapPresensiView extends StatefulWidget {
-  const AdminLihatRekapPresensiView({super.key});
+class AdminRekapPresensiView extends StatefulWidget {
+  const AdminRekapPresensiView({super.key});
 
   @override
-  State<AdminLihatRekapPresensiView> createState() => _AdminLihatRekapPresensiViewState();
+  State<AdminRekapPresensiView> createState() => _AdminRekapPresensiViewState();
 }
 
-class _AdminLihatRekapPresensiViewState extends State<AdminLihatRekapPresensiView> {
+class _AdminRekapPresensiViewState extends State<AdminRekapPresensiView> {
   final adminController = Get.find<AdminController>();
   late List<bool> expansionState;
   final firestore = FirebaseFirestore.instance;
@@ -91,13 +92,14 @@ class _AdminLihatRekapPresensiViewState extends State<AdminLihatRekapPresensiVie
               future: yearDataFuture,
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Center(
+                  return Center(
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        CircularProgressIndicator(),
-                        SizedBox(height: 16),
-                        Text('Mengambil data presensi...'),
+                        CircularProgressIndicator(
+                          color: ColorConstant.blue,
+                        ),
+                        const SizedBox(height: 16),
                       ],
                     ),
                   );
@@ -241,7 +243,7 @@ class _AdminLihatRekapPresensiViewState extends State<AdminLihatRekapPresensiVie
                                                   builder: (context, setState) {
                                                     return AlertDialog(
                                                       title: Text(
-                                                        "Presensi Manual",
+                                                        "Presensi Manual Hari Ini",
                                                         style: TextstyleConstant.nunitoSansBold.copyWith(
                                                           color: ColorConstant.black,
                                                           fontSize: 14,
@@ -337,11 +339,11 @@ class _AdminLihatRekapPresensiViewState extends State<AdminLihatRekapPresensiVie
                                         const SizedBox(width: 10),
                                         GestureDetector(
                                           onTap: () {
-                                            // Aksi untuk mengedit guru
-                                            //Get.to(() => FormulirEditGuru(index: index));
+                                            adminController.fetchDataGuru(guru.username);
+                                            Get.to(() => AdminLihatPresensiGuruView(usernameGuru: guru.username));
                                           },
                                           child: const Icon(
-                                            Icons.edit, // Ikon untuk mengedit
+                                            Icons.date_range_outlined,
                                             size: 24,
                                           ),
                                         ),

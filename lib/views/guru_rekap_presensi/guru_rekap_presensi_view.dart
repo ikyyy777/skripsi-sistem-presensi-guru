@@ -45,7 +45,7 @@ class GuruRekapPresensiView extends StatelessWidget {
             children: [
               PrediodeBulanRekapWidget(month: month, year: year),
               const SizedBox(height: 10),
-              RiwayatPresensiWidget(month: month)
+              RiwayatPresensiWidget()
             ],
           ),
         ),

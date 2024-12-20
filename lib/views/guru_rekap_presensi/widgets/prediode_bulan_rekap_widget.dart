@@ -3,7 +3,6 @@ import 'package:get/get.dart';
 import 'package:presensi_guru/constants/color_constant.dart';
 import 'package:presensi_guru/constants/textstyle_constant.dart';
 import 'package:presensi_guru/controllers/guru_controller.dart';
-import 'package:presensi_guru/models/presensi_model.dart';
 import 'package:presensi_guru/utils/datetime_getters.dart';
 
 class PrediodeBulanRekapWidget extends StatelessWidget {
@@ -17,7 +16,7 @@ class PrediodeBulanRekapWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Obx(() {
-      final riwayatPresensiData = guruController.presensiModel.value;
+      final dataPresensi = guruController.presensiModel.value;
 
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -81,7 +80,7 @@ class PrediodeBulanRekapWidget extends StatelessWidget {
                                 ),
                               ),
                               Text(
-                                riwayatPresensiData!.totalHadir.toString(),
+                                dataPresensi!.totalHadir.toString(),
                                 style: TextstyleConstant.nunitoSansBold.copyWith(
                                   fontSize: 14,
                                   color: ColorConstant.white,
@@ -101,7 +100,7 @@ class PrediodeBulanRekapWidget extends StatelessWidget {
                                 ),
                               ),
                               Text(
-                                riwayatPresensiData!.totalCuti.toString(),
+                                dataPresensi!.totalCuti.toString(),
                                 style: TextstyleConstant.nunitoSansBold.copyWith(
                                   fontSize: 14,
                                   color: ColorConstant.white,
@@ -121,7 +120,7 @@ class PrediodeBulanRekapWidget extends StatelessWidget {
                                 ),
                               ),
                               Text(
-                                riwayatPresensiData!.totalTelat.toString(),
+                                dataPresensi!.totalTelat.toString(),
                                 style: TextstyleConstant.nunitoSansBold.copyWith(
                                   fontSize: 14,
                                   color: ColorConstant.white,

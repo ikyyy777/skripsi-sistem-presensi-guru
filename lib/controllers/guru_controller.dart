@@ -43,7 +43,7 @@ class GuruController extends GetxController {
 
     isPageLoading.value = true;
     await fetchDataGuru();
-    presensiModel.value = await getDataPresensi(
+    presensiModel.value = await getDataPresensiGuru(
         loginController.loggedUsername.value, yearNow, monthNow);
     isPageLoading.value = false;
   }
@@ -54,7 +54,7 @@ class GuruController extends GetxController {
     backgroundTask =
         Timer.periodic(const Duration(seconds: 1), (Timer timer) async {
       await fetchDataGuru();
-      presensiModel.value = await getDataPresensi(
+      presensiModel.value = await getDataPresensiGuru(
           loginController.loggedUsername.value, yearNow, monthNow);
     });
   }
@@ -72,7 +72,7 @@ class GuruController extends GetxController {
     }
   }
 
-  Future<Presensi?> getDataPresensi(
+  Future<Presensi?> getDataPresensiGuru(
       String username, int year, int month) async {
     try {
       // Referensi koleksi

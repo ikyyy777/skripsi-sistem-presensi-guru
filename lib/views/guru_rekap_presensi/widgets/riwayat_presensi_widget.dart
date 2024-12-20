@@ -6,10 +6,9 @@ import 'package:presensi_guru/controllers/guru_controller.dart';
 import 'package:intl/intl.dart';
 
 class RiwayatPresensiWidget extends StatelessWidget {
-  RiwayatPresensiWidget({super.key, required this.month});
+  RiwayatPresensiWidget({super.key});
 
   final guruController = Get.put(GuruController());
-  final String month;
 
   @override
   Widget build(BuildContext context) {

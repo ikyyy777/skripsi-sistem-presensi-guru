@@ -64,7 +64,7 @@ class GuruCardWidget extends StatelessWidget {
                         const SizedBox(height: 5),
                         Obx(() {
                           return FutureBuilder<Presensi?>(
-                            future: guruController.getDataPresensi(
+                            future: guruController.getDataPresensiGuru(
                               loginController.loggedUsername.value,
                               guruController.yearNow,
                               guruController.monthNow,
