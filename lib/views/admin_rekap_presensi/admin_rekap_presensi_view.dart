@@ -68,7 +68,7 @@ class _AdminRekapPresensiViewState extends State<AdminRekapPresensiView> {
         child: AppBar(
           centerTitle: true,
           title: Text(
-            "Lihat & Rekap Presensi",
+            "Rekap Presensi",
             style: TextstyleConstant.nunitoSansBold.copyWith(
               color: ColorConstant.black,
               fontSize: 14,

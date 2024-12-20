@@ -100,7 +100,7 @@ class PrediodeBulanRekapWidget extends StatelessWidget {
                                 ),
                               ),
                               Text(
-                                dataPresensi!.totalCuti.toString(),
+                                dataPresensi.totalCuti.toString(),
                                 style: TextstyleConstant.nunitoSansBold.copyWith(
                                   fontSize: 14,
                                   color: ColorConstant.white,
@@ -120,7 +120,7 @@ class PrediodeBulanRekapWidget extends StatelessWidget {
                                 ),
                               ),
                               Text(
-                                dataPresensi!.totalTelat.toString(),
+                                dataPresensi.totalTelat.toString(),
                                 style: TextstyleConstant.nunitoSansBold.copyWith(
                                   fontSize: 14,
                                   color: ColorConstant.white,

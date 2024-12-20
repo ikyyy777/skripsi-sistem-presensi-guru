@@ -20,7 +20,7 @@ class AdminLihatPresensiGuruView extends StatelessWidget {
       appBar: AppBar(
         centerTitle: true,
         title: Text(
-          "Lihat Presensi Guru",
+          "Riwayat Presensi Guru",
           style: TextstyleConstant.nunitoSansBold.copyWith(
             color: ColorConstant.black,
             fontSize: 14,
@@ -36,54 +36,56 @@ class AdminLihatPresensiGuruView extends StatelessWidget {
           ),
         ),
       ),
-      body: FutureBuilder<Presensi?>(
-        future: adminController.getDataPresensiGuru(
-          usernameGuru,
-          adminController.yearNow,
-          adminController.monthNow,
-        ),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(
-                child: CircularProgressIndicator(
-              color: ColorConstant.blue,
-            ));
-          } else if (adminController.selectedDataGuru.value == null) {
-            return Center(
-                child: CircularProgressIndicator(
-              color: ColorConstant.blue,
-            ));
-          } else if (snapshot.hasError) {
-            return Center(child: Text("Error: ${snapshot.error}"));
-          } else if (!snapshot.hasData || snapshot.data == null) {
-            return Center(
-              child: Text(
-                "Tidak ada data presensi",
-                style: TextstyleConstant.nunitoSansBold.copyWith(
-                  fontSize: 16,
-                  color: ColorConstant.black,
-                ),
-              ),
-            );
-          } else {
-            final presensi = snapshot.data!;
-            return Padding(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                children: [
-                  AdminPeriodeBulanRekapWidget(
-                    presensi: presensi,
-                    guru: adminController.selectedDataGuru.value!,
-                    year: adminController.yearNow.toString(),
-                    month: adminController.monthNow.toString(),
+      body: SingleChildScrollView(
+        child: FutureBuilder<Presensi?>(
+          future: adminController.getDataPresensiGuru(
+            usernameGuru,
+            adminController.yearNow,
+            adminController.monthNow,
+          ),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return Center(
+                  child: CircularProgressIndicator(
+                color: ColorConstant.blue,
+              ));
+            } else if (adminController.selectedDataGuru.value == null) {
+              return Center(
+                  child: CircularProgressIndicator(
+                color: ColorConstant.blue,
+              ));
+            } else if (snapshot.hasError) {
+              return Center(child: Text("Error: ${snapshot.error}"));
+            } else if (!snapshot.hasData || snapshot.data == null) {
+              return Center(
+                child: Text(
+                  "Tidak ada data presensi",
+                  style: TextstyleConstant.nunitoSansBold.copyWith(
+                    fontSize: 16,
+                    color: ColorConstant.black,
                   ),
-                  const SizedBox(height: 10),
-                  AdminRiwayatPresensiWidget(presensi: presensi),
-                ],
-              ),
-            );
-          }
-        },
+                ),
+              );
+            } else {
+              final presensi = snapshot.data!;
+              return Padding(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  children: [
+                    AdminPeriodeBulanRekapWidget(
+                      presensi: presensi,
+                      guru: adminController.selectedDataGuru.value!,
+                      year: adminController.yearNow.toString(),
+                      month: adminController.monthNow.toString(),
+                    ),
+                    const SizedBox(height: 10),
+                    AdminRiwayatPresensiWidget(presensi: presensi),
+                  ],
+                ),
+              );
+            }
+          },
+        ),
       ),
     );
   }

@@ -8,4 +8,5 @@ class Routes {
   static String formulirEditGuru = "/formulirEditGuru";
   static String guruRiwayatPresensiView = "/guruRiwayatPresensiView";
   static String adminLihatRekapPresensiView = "/adminLihatRekapPresensiView";
+  static String guruProfilView = "/guruProfilView";
 }

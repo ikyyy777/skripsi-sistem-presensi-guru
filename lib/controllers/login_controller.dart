@@ -46,28 +46,28 @@ class LoginController extends GetxController {
         final adminData = adminDoc.data() as Map<String, dynamic>;
         if (adminData['username'] == inputUsername &&
             adminData['password'] == inputPassword) {
-          // Dapatkan IMEI perangkat
-          String? imei = await getIMEI();
+          // Dapatkan deviceId perangkat
+          String? deviceId = await getdeviceId();
 
           if (adminData['id_perangkat'] == null || adminData['id_perangkat'] == "") {
-            if (imei != null && imei != 'Permission Denied') {
-              // Update IMEI di Firestore
+            if (deviceId != null && deviceId != 'Permission Denied') {
+              // Update deviceId di Firestore
               await firestore
                   .collection('pegawai')
                   .doc('admin')
-                  .update({'id_perangkat': imei});
+                  .update({'id_perangkat': deviceId});
             }
             Get.back();
             loggedUsername.value = username.text;
             Get.toNamed(Routes.adminDashboardView);
           } else {
-            if (adminData['id_perangkat'] == imei) {
+            if (adminData['id_perangkat'] == deviceId) {
               Get.back();
               loggedUsername.value = username.text;
               Get.toNamed(Routes.adminDashboardView);
             } else {
               Get.back();
-              GetDialogs.showDialog1("Login Gagal!", "IMEI perangkat kamu tidak cocok");
+              GetDialogs.showDialog1("Login Gagal!", "id perangkat kamu tidak cocok");
             }
           }
           return;
@@ -81,13 +81,13 @@ class LoginController extends GetxController {
         final guruData = guruDoc.data() as Map<String, dynamic>;
 
         if (guruData['password'] == inputPassword) {
-          // Dapatkan IMEI perangkat
-          String? deviceId = await getIMEI();
+          // Dapatkan deviceId perangkat
+          String? deviceId = await getdeviceId();
 
           // Cek apakah guru pertama kali login
           if (guruData['id_perangkat'] == null || guruData['id_perangkat'] == "") {
             if (deviceId != null && deviceId != 'Permission Denied') {
-              // Update IMEI di Firestore
+              // Update deviceId di Firestore
               guruData['id_perangkat'] = deviceId;
               await firestore
                   .collection('pegawai')
@@ -104,7 +104,7 @@ class LoginController extends GetxController {
               Get.toNamed(Routes.guruDashboardView);
             } else {
               Get.back();
-              GetDialogs.showDialog1("Login Gagal!", "IMEI tidak cocok");
+              GetDialogs.showDialog1("Login Gagal!", "deviceId tidak cocok");
             }
           }
           return;
@@ -126,7 +126,7 @@ class LoginController extends GetxController {
     }
   }
 
-  Future<String?> getIMEI() async {
+  Future<String?> getdeviceId() async {
     final deviceInfo = DeviceInfoPlugin();
     if (Platform.isAndroid) {
       final androidInfo = await deviceInfo.androidInfo;
