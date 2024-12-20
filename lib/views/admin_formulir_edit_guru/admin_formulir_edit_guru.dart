@@ -297,7 +297,7 @@ class AdminFormulirEditGuru extends StatelessWidget {
                     ),
                     onPressed: () {
                       if (_formKey.currentState!.validate()) {
-                        adminController.updateGuru(
+                        adminController.updateTeacherData(
                           username: adminController.daftarGuru[index].username,
                           nama: formName.text,
                           jenisKelamin: formGender.text,

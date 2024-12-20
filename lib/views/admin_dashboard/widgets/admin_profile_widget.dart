@@ -4,6 +4,7 @@ import 'package:presensi_guru/constants/color_constant.dart';
 import 'package:presensi_guru/constants/textstyle_constant.dart';
 import 'package:presensi_guru/controllers/admin_controller.dart';
 import 'package:presensi_guru/utils/datetime_getters.dart';
+import 'package:presensi_guru/utils/routes.dart';
 
 class AdminProfileWidget extends StatelessWidget {
   AdminProfileWidget({super.key});
@@ -12,40 +13,50 @@ class AdminProfileWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListTile(
-      contentPadding: EdgeInsets.zero,
-      leading: Container(
-        width: 50,
-        height: 50,
-        decoration: BoxDecoration(
-          image: const DecorationImage(
-            image: AssetImage("assets/images/admin_profile.png"),
+    return GestureDetector(
+      onTap: () {
+        Get.toNamed(Routes.adminLogoutView);
+      },
+      child: ListTile(
+        contentPadding: EdgeInsets.zero,
+        leading: Container(
+          width: 50,
+          height: 50,
+          decoration: BoxDecoration(
+            image: const DecorationImage(
+              image: AssetImage("assets/images/admin_profile.png"),
+            ),
+            border: Border.all(
+              color: ColorConstant.grayBorder,
+              width: 1,
+            ),
+            borderRadius: BorderRadius.circular(90),
           ),
-          border: Border.all(
-            color: ColorConstant.grayBorder,
-            width: 1,
-          ),
-          borderRadius: BorderRadius.circular(90),
         ),
-      ),
-      title: Text(
-        "Selamat ${DatetimeGetters.getTimeOfDay()}",
-        style: TextstyleConstant.nunitoSansBold
-            .copyWith(fontSize: 12, color: ColorConstant.black50),
-      ),
-      subtitle: Text(
-        "Administrator",
-        style: TextstyleConstant.nunitoSansBold
-            .copyWith(fontSize: 16, color: ColorConstant.black),
-      ),
-      trailing: GestureDetector(
-        onTap: () {
-          showChangePasswordDialog(context);
-        },
-        child: Text(
-          "Ubah Kata Sandi",
+        title: Text(
+          "Selamat ${DatetimeGetters.getTimeOfDay()}",
           style: TextstyleConstant.nunitoSansBold
               .copyWith(fontSize: 12, color: ColorConstant.black50),
+        ),
+        subtitle: Row(
+          children: [
+            Text(
+              "Administrator",
+              style: TextstyleConstant.nunitoSansBold
+                  .copyWith(fontSize: 16, color: ColorConstant.black),
+            ),
+            Icon(Icons.chevron_right, color: ColorConstant.black),
+          ],
+        ),
+        trailing: GestureDetector(
+          onTap: () {
+            showChangePasswordDialog(context);
+          },
+          child: Text(
+            "Ubah Kata Sandi",
+            style: TextstyleConstant.nunitoSansBold
+                .copyWith(fontSize: 12, color: ColorConstant.black50),
+          ),
         ),
       ),
     );
@@ -84,7 +95,7 @@ class AdminProfileWidget extends StatelessWidget {
                       color: ColorConstant.black50,
                       fontSize: 14,
                     ),
-                    border: OutlineInputBorder(),
+                    border: const OutlineInputBorder(),
                     focusedBorder: OutlineInputBorder(
                       borderSide: BorderSide(
                           color: ColorConstant.blue), // Active border color
@@ -112,7 +123,7 @@ class AdminProfileWidget extends StatelessWidget {
                       color: ColorConstant.black,
                       fontSize: 14,
                     ),
-                    border: OutlineInputBorder(),
+                    border: const OutlineInputBorder(),
                     focusedBorder: OutlineInputBorder(
                       borderSide: BorderSide(
                           color: ColorConstant.blue), // Active border color

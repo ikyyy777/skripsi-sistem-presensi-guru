@@ -50,7 +50,7 @@ class AdminController extends GetxController {
   // Utility classes
   DatetimeGetters datetimeGetters = DatetimeGetters();
   Timer? backgroundTask;
-  
+
   // Variabel untuk periode
   int yearNow = DatetimeGetters.getYearNow();
   int monthNow = DateTime.now().month;
@@ -75,7 +75,7 @@ class AdminController extends GetxController {
   /// Inisialisasi halaman admin
   Future<void> initPage() async {
     await fetchAdminCardData();
-    await fetchDataGuruList();
+    await getTeachersDataList();
   }
 
   /// Memulai background task untuk refresh data secara periodik
@@ -87,7 +87,7 @@ class AdminController extends GetxController {
   }
 
   /// Mengambil data presensi guru
-  Future<Presensi?> getDataPresensiGuru(
+  Future<Presensi?> getTeacherPresenceData(
       String username, int year, int month) async {
     try {
       // Referensi koleksi
@@ -152,7 +152,7 @@ class AdminController extends GetxController {
   }
 
   /// Mengambil data semua guru dari Firestore
-  Future<void> fetchDataGuruList() async {
+  Future<void> getTeachersDataList() async {
     try {
       QuerySnapshot pegawaiCollection =
           await firestore.collection('pegawai').get();
@@ -174,10 +174,9 @@ class AdminController extends GetxController {
   }
 
   /// Mengambil data presensi guru
-  
 
   /// Menambahkan data guru baru ke Firestore
-  Future<void> addGuru() async {
+  Future<void> addTeacher() async {
     // Cek username duplikat
     QuerySnapshot querySnapshot = await firestore
         .collection('pegawai')
@@ -246,7 +245,7 @@ class AdminController extends GetxController {
   }
 
   /// Mengupdate data guru yang sudah ada
-  Future<void> updateGuru({
+  Future<void> updateTeacherData({
     required String username,
     required String nama,
     required String jenisKelamin,
@@ -287,7 +286,7 @@ class AdminController extends GetxController {
   }
 
   /// Menghapus data guru
-  Future<void> deleteGuru(String username, BuildContext context) async {
+  Future<void> deleteTeacher(String username, BuildContext context) async {
     try {
       // Dialog konfirmasi penghapusan
       bool? confirm = await showDialog<bool>(
@@ -332,7 +331,7 @@ class AdminController extends GetxController {
 
       if (confirm == true) {
         await firestore.collection('pegawai').doc(username).delete();
-        await fetchDataGuruList();
+        await getTeachersDataList();
 
         GetDialogs.showSnackBar1("Guru Dihapus", "Berhasil hapus guru");
       } else {
@@ -348,7 +347,7 @@ class AdminController extends GetxController {
   }
 
   /// Mengambil data rekap presensi untuk periode tertentu
-  Future<Map<String, dynamic>> cetakRekapPresensi({
+  Future<Map<String, dynamic>> getPresenceRecap({
     required int tahun,
     required int bulan,
   }) async {
@@ -439,7 +438,7 @@ class AdminController extends GetxController {
   }
 
   /// Export data rekap presensi ke Excel
-  Future<void> exportToExcel(Map<String, dynamic> rekapData) async {
+  Future<void> exportPresenceDataToExcel(Map<String, dynamic> rekapData) async {
     try {
       await requestStoragePermission();
       GetDialogs.showCircularLoading();
@@ -599,7 +598,7 @@ class AdminController extends GetxController {
   }
 
   /// Mengirim data cuti guru
-  Future<void> kirimPresensiManual(
+  Future<void> postPresenceManual(
       String username, String tanggalPresensi, String keterangan) async {
     try {
       DateTime dateTime = DateTime.parse(tanggalPresensi);
@@ -675,12 +674,11 @@ class AdminController extends GetxController {
     }
   }
 
+  /// Mengambil data guru berdasarkan username
   Future<void> fetchDataGuru(String username) async {
     try {
-      DocumentSnapshot doc = await firestore
-          .collection('pegawai')
-          .doc(username)
-          .get();
+      DocumentSnapshot doc =
+          await firestore.collection('pegawai').doc(username).get();
       selectedDataGuru.value = GuruModel.fromDocumentSnapshot(doc);
     } catch (e) {
       log(e.toString());

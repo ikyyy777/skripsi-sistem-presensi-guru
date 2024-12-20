@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:presensi_guru/utils/routes.dart';
 import 'package:presensi_guru/views/admin_dashboard/admin_dashboard_view.dart';
+import 'package:presensi_guru/views/admin_dashboard/admin_logout_view.dart';
 import 'package:presensi_guru/views/admin_rekap_presensi/admin_rekap_presensi_view.dart';
 import 'package:presensi_guru/views/admin_formulir_tambah_guru/admin_formulir_tambah_guru_view.dart';
 import 'package:presensi_guru/views/guru_dashboard/guru_dashboard_view.dart';
@@ -42,7 +43,7 @@ class MyApp extends StatelessWidget {
       getPages: [
         GetPage(
           name: Routes.splashScreen,
-          page: () => SplashscreenView(),
+          page: () => const SplashscreenView(),
         ),
         GetPage(
           name: Routes.loginView,
@@ -54,7 +55,7 @@ class MyApp extends StatelessWidget {
         ),
         GetPage(
           name: Routes.adminDashboardView,
-          page: () => AdminDashboardView(),
+          page: () => const AdminDashboardView(),
         ),
         GetPage(
           name: Routes.formulirTambahGuruView,
@@ -62,15 +63,19 @@ class MyApp extends StatelessWidget {
         ),
         GetPage(
           name: Routes.guruRiwayatPresensiView,
-          page: () => GuruRiwayatPresensiView(),
+          page: () => const GuruRiwayatPresensiView(),
         ),
         GetPage(
           name: Routes.adminLihatRekapPresensiView,
-          page: () => AdminRekapPresensiView(),
+          page: () => const AdminRekapPresensiView(),
         ),
         GetPage(
           name: Routes.guruProfilView,
           page: () => GuruProfilView(),
+        ),
+        GetPage(
+          name: Routes.adminLogoutView,
+          page: () => const AdminLogoutView(),
         ),
       ],
     );

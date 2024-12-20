@@ -67,7 +67,7 @@ class AdminDaftarGuruWidget extends StatelessWidget {
                     const SizedBox(width: 10),
                     GestureDetector(
                       onTap: () {
-                        adminController.deleteGuru(guru.username, context);
+                        adminController.deleteTeacher(guru.username, context);
                       },
                       child: const Icon(
                         Icons.delete,

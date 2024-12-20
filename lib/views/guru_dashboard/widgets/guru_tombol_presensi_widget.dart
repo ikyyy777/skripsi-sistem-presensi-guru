@@ -5,7 +5,7 @@ import 'package:presensi_guru/constants/textstyle_constant.dart';
 import 'package:presensi_guru/controllers/guru_controller.dart';
 
 class GuruTombolPresensiWidget extends StatefulWidget {
-  GuruTombolPresensiWidget({super.key});
+  const GuruTombolPresensiWidget({super.key});
 
   @override
   _GuruTombolPresensiWidgetState createState() =>
@@ -23,7 +23,7 @@ class _GuruTombolPresensiWidgetState extends State<GuruTombolPresensiWidget>
     super.initState();
     // Initialize the AnimationController
     _controller = AnimationController(
-      duration: Duration(seconds: 1),
+      duration: const Duration(seconds: 1),
       vsync: this,
     )..repeat(reverse: true); // Repeat the animation
 
@@ -64,13 +64,13 @@ class _GuruTombolPresensiWidgetState extends State<GuruTombolPresensiWidget>
         // The actual ElevatedButton in the center
         ElevatedButton(
           onPressed: () {
-            guruController.kirimPresensi();
+            guruController.postPresence();
           },
           style: ElevatedButton.styleFrom(
             backgroundColor: ColorConstant.blue,
-            shape: CircleBorder(),
-            padding: EdgeInsets.all(0),
-            minimumSize: Size(150, 150), // Set the size of the button
+            shape: const CircleBorder(),
+            padding: const EdgeInsets.all(0),
+            minimumSize: const Size(150, 150), // Set the size of the button
           ),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,

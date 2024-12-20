@@ -140,7 +140,7 @@ class LoginView extends StatelessWidget {
                       ),
                     ),
                     onPressed: () {
-                      loginController.login();
+                      loginController.postLogin();
                     },
                     child: Center(
                       child: Text(

@@ -42,8 +42,8 @@ class GuruController extends GetxController {
     final loginController = Get.put(LoginController());
 
     isPageLoading.value = true;
-    await fetchDataGuru();
-    presensiModel.value = await getDataPresensiGuru(
+    await getTeacherData();
+    presensiModel.value = await getTeacherPresenceData(
         loginController.loggedUsername.value, yearNow, monthNow);
     isPageLoading.value = false;
   }
@@ -53,13 +53,13 @@ class GuruController extends GetxController {
 
     backgroundTask =
         Timer.periodic(const Duration(seconds: 1), (Timer timer) async {
-      await fetchDataGuru();
-      presensiModel.value = await getDataPresensiGuru(
+      await getTeacherData();
+      presensiModel.value = await getTeacherPresenceData(
           loginController.loggedUsername.value, yearNow, monthNow);
     });
   }
 
-  Future<void> fetchDataGuru() async {
+  Future<void> getTeacherData() async {
     try {
       final loginController = Get.put(LoginController());
       DocumentSnapshot doc = await firestore
@@ -72,7 +72,7 @@ class GuruController extends GetxController {
     }
   }
 
-  Future<Presensi?> getDataPresensiGuru(
+  Future<Presensi?> getTeacherPresenceData(
       String username, int year, int month) async {
     try {
       // Referensi koleksi
@@ -114,7 +114,7 @@ class GuruController extends GetxController {
     }
   }
 
-  String checkTepatWaktu() {
+  String checkOntime() {
     // Ambil waktu saat ini
     DateTime sekarang = DateTime.now();
 
@@ -145,9 +145,9 @@ class GuruController extends GetxController {
     }
   }
 
-  Future<void> kirimPresensi() async {
+  Future<void> postPresence() async {
     try {
-      final keterangan = checkTepatWaktu();
+      final keterangan = checkOntime();
       String todayDateTime = DatetimeGetters.getFormattedDateTimeNow();
       String todayDate = DatetimeGetters.getDateNowInt();
       String jamMasuk = DateTime.now().toString().split(" ")[1].substring(0, 8);

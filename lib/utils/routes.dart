@@ -9,4 +9,5 @@ class Routes {
   static String guruRiwayatPresensiView = "/guruRiwayatPresensiView";
   static String adminLihatRekapPresensiView = "/adminLihatRekapPresensiView";
   static String guruProfilView = "/guruProfilView";
+  static String adminLogoutView = "/adminLogoutView";
 }

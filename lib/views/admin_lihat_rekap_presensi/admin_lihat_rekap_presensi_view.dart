@@ -10,14 +10,14 @@ import 'package:presensi_guru/utils/datetime_getters.dart';
 import 'package:presensi_guru/utils/get_dialogs.dart';
 import 'package:presensi_guru/views/admin_lihat_presensi_guru/admin_lihat_presensi_guru_view.dart';
 
-class AdminRekapPresensiView extends StatefulWidget {
-  const AdminRekapPresensiView({super.key});
+class AdminLihatRekapPresensiView extends StatefulWidget {
+  const AdminLihatRekapPresensiView({super.key});
 
   @override
-  State<AdminRekapPresensiView> createState() => _AdminRekapPresensiViewState();
+  State<AdminLihatRekapPresensiView> createState() => _AdminLihatRekapPresensiViewState();
 }
 
-class _AdminRekapPresensiViewState extends State<AdminRekapPresensiView> {
+class _AdminLihatRekapPresensiViewState extends State<AdminLihatRekapPresensiView> {
   final adminController = Get.find<AdminController>();
   late List<bool> expansionState;
   final firestore = FirebaseFirestore.instance;
@@ -68,7 +68,7 @@ class _AdminRekapPresensiViewState extends State<AdminRekapPresensiView> {
         child: AppBar(
           centerTitle: true,
           title: Text(
-            "Rekap Presensi",
+            "Lihat & Rekap Presensi",
             style: TextstyleConstant.nunitoSansBold.copyWith(
               color: ColorConstant.black,
               fontSize: 14,
@@ -242,9 +242,6 @@ class _AdminRekapPresensiViewState extends State<AdminRekapPresensiView> {
                                                 return StatefulBuilder(
                                                   builder: (context, setState) {
                                                     return AlertDialog(
-                                                      shape: RoundedRectangleBorder(
-                                                        borderRadius: BorderRadius.circular(10),
-                                                      ),
                                                       title: Text(
                                                         "Presensi Manual Hari Ini",
                                                         style: TextstyleConstant.nunitoSansBold.copyWith(
@@ -342,11 +339,10 @@ class _AdminRekapPresensiViewState extends State<AdminRekapPresensiView> {
                                         const SizedBox(width: 10),
                                         GestureDetector(
                                           onTap: () {
-                                            adminController.fetchDataGuru(guru.username);
                                             Get.to(() => AdminLihatPresensiGuruView(usernameGuru: guru.username));
                                           },
                                           child: const Icon(
-                                            Icons.date_range_outlined,
+                                            Icons.date_range_outlined, // Ikon untuk mengedit
                                             size: 24,
                                           ),
                                         ),

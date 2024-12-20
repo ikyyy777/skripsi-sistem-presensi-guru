@@ -6,7 +6,7 @@ import 'package:presensi_guru/models/presensi_model.dart';
 import 'package:presensi_guru/utils/datetime_getters.dart';
 
 class AdminPeriodeBulanRekapWidget extends StatelessWidget {
-  AdminPeriodeBulanRekapWidget({super.key, required this.presensi, required this.month, required this.year, required this.guru});
+  const AdminPeriodeBulanRekapWidget({super.key, required this.presensi, required this.month, required this.year, required this.guru});
   
   final GuruModel guru;
   final Presensi presensi;

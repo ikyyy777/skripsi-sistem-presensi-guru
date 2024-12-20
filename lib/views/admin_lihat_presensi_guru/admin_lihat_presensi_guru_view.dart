@@ -38,7 +38,7 @@ class AdminLihatPresensiGuruView extends StatelessWidget {
       ),
       body: SingleChildScrollView(
         child: FutureBuilder<Presensi?>(
-          future: adminController.getDataPresensiGuru(
+          future: adminController.getTeacherPresenceData(
             usernameGuru,
             adminController.yearNow,
             adminController.monthNow,

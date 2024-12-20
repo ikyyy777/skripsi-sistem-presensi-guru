@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:presensi_guru/constants/color_constant.dart';
 import 'package:presensi_guru/views/admin_dashboard/widgets/admin_card_widget.dart';
 import 'package:presensi_guru/views/admin_dashboard/widgets/admin_daftar_guru_widget.dart';
@@ -20,7 +21,7 @@ class _AdminDashboardViewState extends State<AdminDashboardView> {
   Widget build(BuildContext context) {
     return PopScope(
       canPop: false,
-      onPopInvoked: (didPop) async {
+      onPopInvokedWithResult: (didPop, result) {
         if (didPop) return;
         
         final now = DateTime.now();
@@ -40,7 +41,12 @@ class _AdminDashboardViewState extends State<AdminDashboardView> {
           );
           return;
         }
-        Navigator.of(context).pop();
+        if (Navigator.canPop(context)) {
+          Navigator.of(context).pop();
+        } else {
+          // Close the app
+          SystemNavigator.pop();
+        }
       },
       child: Scaffold(
         backgroundColor: ColorConstant.white,
@@ -55,11 +61,11 @@ class _AdminDashboardViewState extends State<AdminDashboardView> {
                   const SizedBox(height: 10),
                   AdminCardWidget(),
                   const SizedBox(height: 20),
-                  AdminRekapWidget(),
+                  const AdminRekapWidget(),
                   const SizedBox(height: 20),
                   AdminDaftarGuruWidget(),
                   const SizedBox(height: 20),
-                  AdminTambahGuruButtonWidget(),
+                  const AdminTambahGuruButtonWidget(),
                 ],
               ),
             ),

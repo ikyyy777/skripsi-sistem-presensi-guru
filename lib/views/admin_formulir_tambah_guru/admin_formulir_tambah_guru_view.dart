@@ -246,7 +246,7 @@ class AdminFormulirTambahGuruView extends StatelessWidget {
                     onPressed: () {
                       if (_formKey.currentState!.validate()) {
                         // Jika form valid, lanjutkan dengan aksi
-                        adminController.addGuru();
+                        adminController.addTeacher();
                         adminController.initPage();
                         Get.back();
                       }

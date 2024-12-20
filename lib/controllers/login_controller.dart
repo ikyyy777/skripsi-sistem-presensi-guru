@@ -19,7 +19,7 @@ class LoginController extends GetxController {
     isPasswordHidden.value = !isPasswordHidden.value;
   }
 
-  Future<void> login() async {
+  Future<void> postLogin() async {
     try {
       // Tampilkan dialog loading
       GetDialogs.showCircularLoading();
@@ -104,7 +104,7 @@ class LoginController extends GetxController {
               Get.toNamed(Routes.guruDashboardView);
             } else {
               Get.back();
-              GetDialogs.showDialog1("Login Gagal!", "deviceId tidak cocok");
+              GetDialogs.showDialog1("Login Gagal!", "Id perangkat tidak cocok");
             }
           }
           return;
