@@ -3,7 +3,7 @@ import 'package:get/get.dart';
 import 'package:presensi_guru/constants/color_constant.dart';
 import 'package:presensi_guru/constants/textstyle_constant.dart';
 import 'package:presensi_guru/controllers/admin_controller.dart';
-import 'package:presensi_guru/views/formulir_edit_guru/formulir_edit_guru.dart';
+import 'package:presensi_guru/views/admin_formulir_edit_guru/admin_formulir_edit_guru.dart';
 
 class AdminDaftarGuruWidget extends StatelessWidget {
   AdminDaftarGuruWidget({super.key});
@@ -57,7 +57,7 @@ class AdminDaftarGuruWidget extends StatelessWidget {
                   children: [
                     GestureDetector(
                       onTap: () {
-                        Get.to(()=> FormulirEditGuru(index: index));
+                        Get.to(()=> AdminFormulirEditGuru(index: index));
                       },
                       child: const Icon(
                         Icons.edit,

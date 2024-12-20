@@ -6,8 +6,8 @@ import 'package:presensi_guru/controllers/admin_controller.dart';
 import 'package:presensi_guru/global_widgets/custom_global_form_field.dart';
 import 'package:presensi_guru/global_widgets/gender_global_dropdown_field.dart';
 
-class FormulirTambahGuruView extends StatelessWidget {
-  FormulirTambahGuruView({super.key});
+class AdminFormulirTambahGuruView extends StatelessWidget {
+  AdminFormulirTambahGuruView({super.key});
 
   final adminController = Get.put(AdminController());
   final _formKey = GlobalKey<FormState>(); // Tambahkan GlobalKey untuk validasi

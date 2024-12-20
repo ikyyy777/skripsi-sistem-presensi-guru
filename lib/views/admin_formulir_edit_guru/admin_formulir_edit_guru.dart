@@ -6,8 +6,8 @@ import 'package:presensi_guru/controllers/admin_controller.dart';
 import 'package:presensi_guru/global_widgets/custom_global_form_field.dart';
 import 'package:presensi_guru/global_widgets/gender_global_dropdown_field.dart';
 
-class FormulirEditGuru extends StatelessWidget {
-  FormulirEditGuru({
+class AdminFormulirEditGuru extends StatelessWidget {
+  AdminFormulirEditGuru({
     super.key,
     required this.index,
   });

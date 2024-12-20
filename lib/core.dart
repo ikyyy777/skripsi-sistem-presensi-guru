@@ -20,8 +20,8 @@ export 'package:presensi_guru/views/admin_dashboard/widgets/admin_daftar_guru_wi
 export 'package:presensi_guru/views/admin_dashboard/widgets/admin_profile_widget.dart';
 export 'package:presensi_guru/views/admin_dashboard/widgets/admin_rekap_widget.dart';
 export 'package:presensi_guru/views/admin_dashboard/widgets/admin_tambah_guru_button_widget.dart';
-export 'package:presensi_guru/views/formulir_edit_guru/formulir_edit_guru.dart';
-export 'package:presensi_guru/views/formulir_tambah_guru/formulir_tambah_guru_view.dart';
+export 'package:presensi_guru/views/admin_formulir_edit_guru/admin_formulir_edit_guru.dart';
+export 'package:presensi_guru/views/admin_formulir_tambah_guru/admin_formulir_tambah_guru_view.dart';
 export 'package:presensi_guru/views/guru_dashboard/guru_dashboard_view.dart';
 export 'package:presensi_guru/views/guru_dashboard/widgets/guru_card_widget.dart';
 export 'package:presensi_guru/views/guru_dashboard/widgets/guru_profile_widget.dart';
