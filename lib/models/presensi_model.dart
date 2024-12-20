@@ -5,6 +5,7 @@ class RiwayatPresensi {
   final String jamMasuk;
   final String? jamKeluar;
   final String keterangan;
+  final String dibuatPada;
 
   RiwayatPresensi({
     required this.riwayatId,
@@ -13,6 +14,7 @@ class RiwayatPresensi {
     required this.jamMasuk,
     this.jamKeluar,
     required this.keterangan,
+    required this.dibuatPada,
   });
 
   factory RiwayatPresensi.fromMap(Map<String, dynamic> map) {
@@ -23,6 +25,7 @@ class RiwayatPresensi {
       jamMasuk: map['jam_masuk'],
       jamKeluar: map['jam_keluar'],
       keterangan: map['keterangan'],
+      dibuatPada: map['dibuat_pada'],
     );
   }
 }
@@ -36,6 +39,8 @@ class Presensi {
   final int totalCuti;
   final int totalTelat;
   final List<RiwayatPresensi> riwayatPresensi;
+  final String dibuatPada;
+
 
   Presensi({
     required this.presensiId,
@@ -46,6 +51,7 @@ class Presensi {
     required this.totalCuti,
     required this.totalTelat,
     required this.riwayatPresensi,
+    required this.dibuatPada,
   });
 
   factory Presensi.fromMap(Map<String, dynamic> map, List<RiwayatPresensi> riwayatPresensi) {
@@ -58,6 +64,7 @@ class Presensi {
       totalCuti: map['total_cuti'],
       totalTelat: map['total_telat'],
       riwayatPresensi: riwayatPresensi,
+      dibuatPada: map['dibuat_pada'],
     );
   }
 }

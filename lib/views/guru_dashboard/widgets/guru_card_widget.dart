@@ -95,6 +95,7 @@ class GuruCardWidget extends StatelessWidget {
                                     jamMasuk: '',
                                     jamKeluar: null,
                                     keterangan: 'Belum Absen',
+                                    dibuatPada: '',
                                   ),
                                 );
 

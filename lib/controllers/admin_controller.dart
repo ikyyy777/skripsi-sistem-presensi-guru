@@ -549,6 +549,7 @@ class AdminController extends GetxController {
     try {
       DateTime dateTime = DateTime.parse(tanggalPresensi);
       String formattedTanggal = DatetimeGetters.getFormattedDateTimeNow();
+      String todayDate = DatetimeGetters.getDateNowInt();
       String presensiId = "${username}_${dateTime.year}_${dateTime.month}";
       String riwayatId = "${presensiId}_${dateTime.day}";
 
@@ -582,7 +583,8 @@ class AdminController extends GetxController {
           'presensi_id': presensiId,
           'tanggal_presensi': formattedTanggal,
           'keterangan': keterangan,
-          'jam_masuk': '-'
+          'jam_masuk': '-',
+          'dibuat_pada': todayDate,
         });
       } else {
         // Cek dan update dokumen presensi
@@ -606,7 +608,8 @@ class AdminController extends GetxController {
           'presensi_id': presensiId,
           'tanggal_presensi': formattedTanggal,
           'keterangan': keterangan,
-          'jam_masuk': '-'
+          'jam_masuk': '-',
+          'dibuat_pada': todayDate,
         });
 
         GetDialogs.showSnackBar1('Berhasil', 'Berhasil mengirim data cuti');

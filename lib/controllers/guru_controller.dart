@@ -148,7 +148,8 @@ class GuruController extends GetxController {
   Future<void> kirimPresensi() async {
     try {
       final keterangan = checkTepatWaktu();
-      String todayDate = DatetimeGetters.getFormattedDateTimeNow();
+      String todayDateTime = DatetimeGetters.getFormattedDateTimeNow();
+      String todayDate = DatetimeGetters.getDateNowInt();
       String jamMasuk = DateTime.now().toString().split(" ")[1].substring(0, 8);
 
       final loginController = Get.put(LoginController());
@@ -195,6 +196,7 @@ class GuruController extends GetxController {
           "total_hadir": 1,
           "total_cuti": 0,
           "total_telat": 0,
+          "dibuat_pada": todayDate,
         });
       } else {
         // If presensi document exists, update total_hadir or total_telat
@@ -219,9 +221,10 @@ class GuruController extends GetxController {
       await firestore.collection('riwayat_presensi').doc(riwayatId).set({
         "riwayat_id": riwayatId,
         "presensi_id": presensiId,
-        "tanggal_presensi": todayDate,
+        "tanggal_presensi": todayDateTime,
         "jam_masuk": jamMasuk,
         "keterangan": keterangan,
+        "dibuat_pada": todayDate,
       });
 
       GetDialogs.showSnackBar1(

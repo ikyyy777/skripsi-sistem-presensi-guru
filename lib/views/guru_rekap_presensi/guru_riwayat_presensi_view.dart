@@ -76,12 +76,14 @@ class _GuruRiwayatPresensiViewState extends State<GuruRiwayatPresensiView> {
         final groupedByYear = _groupByYearAndMonth(riwayatPresensiData);
 
         // Update jumlah expansion state jika jumlah tahun berubah
-        if (expansionState.length != groupedByYear.keys.length) {
-          setState(() {
-            expansionState =
-                List.generate(groupedByYear.keys.length, (_) => false);
-          });
-        }
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (expansionState.length != groupedByYear.keys.length) {
+            setState(() {
+              expansionState =
+                  List.generate(groupedByYear.keys.length, (_) => false);
+            });
+          }
+        });
 
         return ListView.builder(
           itemCount: groupedByYear.keys.length,

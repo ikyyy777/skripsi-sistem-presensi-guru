@@ -64,6 +64,11 @@ class DatetimeGetters {
     return "pagi";
   }
 
+  static String getDateNowInt() {
+    final now = DateTime.now();
+    return '${now.day.toString().padLeft(2, '0')}-${now.month.toString().padLeft(2, '0')}-${now.year}';
+  }
+
   static String getFormattedDateTimeNow() {
     // Mendapatkan tanggal sekarang
     DateTime now = DateTime.now();

@@ -3,7 +3,7 @@ import 'package:get/get.dart';
 import 'package:presensi_guru/constants/color_constant.dart';
 import 'package:presensi_guru/constants/textstyle_constant.dart';
 import 'package:presensi_guru/controllers/guru_controller.dart';
-import 'package:presensi_guru/models/presensi_model.dart';
+import 'package:intl/intl.dart';
 
 class RiwayatPresensiWidget extends StatelessWidget {
   RiwayatPresensiWidget({super.key, required this.month});
@@ -40,14 +40,19 @@ class RiwayatPresensiWidget extends StatelessWidget {
               ),
             );
           } else {
+            // Sort the list by "dibuat_pada" in descending order
+            riwayatPresensiData.riwayatPresensi.sort((a, b) {
+              DateTime dateA = DateFormat('dd-MM-yyyy').parse(a.dibuatPada);
+              DateTime dateB = DateFormat('dd-MM-yyyy').parse(b.dibuatPada);
+              return dateB.compareTo(dateA);
+            });
+
             return ListView.builder(
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
               itemCount: riwayatPresensiData.riwayatPresensi.length,
               itemBuilder: (BuildContext context, int index) {
-                // Accessing reversed list outside of itemBuilder to improve performance
-                var presensiItem =
-                    riwayatPresensiData.riwayatPresensi.reversed.toList()[index];
+                var presensiItem = riwayatPresensiData.riwayatPresensi[index];
 
                 return Container(
                   margin: const EdgeInsets.only(bottom: 20),

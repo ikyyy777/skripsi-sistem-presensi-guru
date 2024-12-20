@@ -3,9 +3,8 @@ import 'package:get/get.dart';
 import 'package:presensi_guru/constants/color_constant.dart';
 import 'package:presensi_guru/constants/textstyle_constant.dart';
 import 'package:presensi_guru/controllers/guru_controller.dart';
-import 'package:presensi_guru/models/presensi_model.dart';
-import 'package:presensi_guru/utils/datetime_getters.dart';
 import 'package:presensi_guru/utils/routes.dart';
+import 'package:intl/intl.dart';
 
 class GuruRiwayatPresensiWidget extends StatelessWidget {
   GuruRiwayatPresensiWidget({super.key});
@@ -73,14 +72,19 @@ class GuruRiwayatPresensiWidget extends StatelessWidget {
               ),
             );
           } else {
+            // Urutkan riwayat presensi berdasarkan "dibuat_pada" dari terbaru ke terlama
+            riwayatPresensiData.riwayatPresensi.sort((a, b) {
+              DateTime dateA = DateFormat('dd-MM-yyyy').parse(a.dibuatPada);
+              DateTime dateB = DateFormat('dd-MM-yyyy').parse(b.dibuatPada);
+              return dateB.compareTo(dateA);
+            });
+
             return ListView.builder(
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
               itemCount: totalPresensi,
               itemBuilder: (BuildContext context, int index) {
-                // Ambil data riwayat presensi pada bulan ini, dibalik urutannya
-                var presensiItem = riwayatPresensiData.riwayatPresensi.reversed
-                    .toList()[index];
+                var presensiItem = riwayatPresensiData.riwayatPresensi[index];
 
                 return Container(
                   margin: const EdgeInsets.only(bottom: 20),
