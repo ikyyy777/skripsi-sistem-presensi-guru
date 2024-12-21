@@ -75,7 +75,7 @@ class MyApp extends StatelessWidget {
         ),
         GetPage(
           name: Routes.adminLogoutView,
-          page: () => const AdminLogoutView(),
+          page: () => AdminLogoutView(),
         ),
       ],
     );

@@ -3,12 +3,13 @@ import 'package:presensi_guru/constants/color_constant.dart';
 import 'package:presensi_guru/constants/textstyle_constant.dart';
 import 'package:presensi_guru/controllers/guru_controller.dart';
 import 'package:get/get.dart';
-import 'package:presensi_guru/utils/routes.dart';
+import 'package:presensi_guru/controllers/login_controller.dart';
 
 class GuruProfilView extends StatelessWidget {
   GuruProfilView({super.key});
 
   final guruController = Get.put(GuruController());
+  final loginController = Get.put(LoginController());
 
   @override
   Widget build(BuildContext context) {
@@ -86,7 +87,7 @@ class GuruProfilView extends StatelessWidget {
               child: ElevatedButton(
                 onPressed: () {
                   // Logika untuk logout
-                  Get.offAllNamed(Routes.loginView);
+                  loginController.logout();
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: ColorConstant.red,

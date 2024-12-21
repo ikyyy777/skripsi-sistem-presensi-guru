@@ -6,6 +6,7 @@ import 'package:get/get.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:presensi_guru/utils/get_dialogs.dart';
 import 'package:presensi_guru/utils/routes.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginController extends GetxController {
   TextEditingController username = TextEditingController();
@@ -42,6 +43,7 @@ class LoginController extends GetxController {
       DocumentSnapshot adminDoc =
           await firestore.collection('pegawai').doc("admin").get();
 
+      // Cek apakah admin ada
       if (adminDoc.exists) {
         final adminData = adminDoc.data() as Map<String, dynamic>;
         if (adminData['username'] == inputUsername &&
@@ -59,11 +61,15 @@ class LoginController extends GetxController {
             }
             Get.back();
             loggedUsername.value = username.text;
+            SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+            sharedPreferences.setString('savedUsername', username.text);
             Get.toNamed(Routes.adminDashboardView);
           } else {
             if (adminData['id_perangkat'] == deviceId) {
               Get.back();
               loggedUsername.value = username.text;
+              SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+              sharedPreferences.setString('savedUsername', username.text);
               Get.toNamed(Routes.adminDashboardView);
             } else {
               Get.back();
@@ -96,11 +102,15 @@ class LoginController extends GetxController {
             }
             Get.back();
             loggedUsername.value = username.text;
+            SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+            sharedPreferences.setString('savedUsername', username.text);
             Get.toNamed(Routes.guruDashboardView);
           } else {
             if (guruData['id_perangkat'] == deviceId) {
               Get.back();
               loggedUsername.value = username.text;
+              SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+              sharedPreferences.setString('savedUsername', username.text);
               Get.toNamed(Routes.guruDashboardView);
             } else {
               Get.back();
@@ -136,5 +146,11 @@ class LoginController extends GetxController {
       return iosInfo.identifierForVendor; // iOS Identifier
     }
     return null;
+  }
+
+  Future<void> logout() async {
+    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+    sharedPreferences.remove('savedUsername');
+    Get.offAllNamed(Routes.loginView);
   }
 }

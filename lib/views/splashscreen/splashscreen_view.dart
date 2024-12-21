@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:presensi_guru/utils/routes.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class SplashscreenView extends StatefulWidget {
   const SplashscreenView({super.key});
@@ -12,28 +13,21 @@ class SplashscreenView extends StatefulWidget {
 
 class _SplashscreenViewState extends State<SplashscreenView> {
 
-  Future<void> initializeDatbase() async {
-    FirebaseFirestore firestore = FirebaseFirestore.instance;
-
-      // Periksa apakah dokumen admin ada
-      DocumentSnapshot adminDoc =
-          await firestore.collection('akun_pegawai').doc('admin').get();
-
-      if (!adminDoc.exists) {
-        // Jika admin belum ada, buat dokumen default
-        await firestore.collection('akun_pegawai').doc('admin').set({
-          "username": "admin",
-          "password": "admin123",
-          "id_perangkat": "",
-        });
-      }
+  Future<void> checkLogin() async {
+    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+    String? savedUsername = sharedPreferences.getString('savedUsername');
+    if (savedUsername != null) {
+      Get.offAllNamed(Routes.adminDashboardView);
+    } else {
+      Get.offAllNamed(Routes.loginView);
+    }
   }
 
   @override
   void initState() {
     super.initState();
     Future.delayed(const Duration(seconds: 2), () {
-      Get.offAllNamed(Routes.loginView);
+      checkLogin();
     });
   }
 

@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:presensi_guru/constants/textstyle_constant.dart';
+import 'package:presensi_guru/controllers/login_controller.dart';
 
 class AdminLogoutView extends StatelessWidget {
-  const AdminLogoutView({super.key});
+  AdminLogoutView({super.key});
+
+  final loginController = Get.put(LoginController());
 
   @override
   Widget build(BuildContext context) {
@@ -21,8 +25,7 @@ class AdminLogoutView extends StatelessWidget {
       body: Center(
         child: ElevatedButton(
           onPressed: () {
-            // Logika untuk logout
-            Navigator.of(context).pop();
+            loginController.logout();
           },
           style: ElevatedButton.styleFrom(
             backgroundColor: Colors.red,
