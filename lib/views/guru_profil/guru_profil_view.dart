@@ -63,7 +63,29 @@ class GuruProfilView extends StatelessWidget {
             const SizedBox(height: 10),
             _buildBiodataPribadi("No. HP", guruController.dataGuru.value?.noHp ?? ""),
             const SizedBox(height: 10),
-            _buildBiodataPribadi("Alamat", guruController.dataGuru.value?.alamat ?? ""),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  "Alamat",
+                  style: TextstyleConstant.nunitoSansMedium.copyWith(
+                    color: ColorConstant.black,
+                    fontSize: 14,
+                  ),
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Text(
+                    guruController.dataGuru.value?.alamat ?? "",
+                    style: TextstyleConstant.nunitoSansMedium.copyWith(
+                      color: ColorConstant.black50,
+                      fontSize: 14,
+                    ),
+                    textAlign: TextAlign.end,
+                  ),
+                ),
+              ],
+            ),
 
             const SizedBox(height: 16),
             Text(
