@@ -640,6 +640,8 @@ class AdminController extends GetxController {
           'jam_masuk': '-',
           'dibuat_pada': todayDate,
         });
+
+        GetDialogs.showSnackBar1('Berhasil', 'Berhasil mengirim data hadir');
       } else {
         // Cek dan update dokumen presensi
         DocumentSnapshot presensiDoc =

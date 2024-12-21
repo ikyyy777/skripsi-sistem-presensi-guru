@@ -10,10 +10,10 @@
     <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE"/>
     
     <application
-        android:label="presensi_guru"
+        android:label="Presensi Guru"
         android:name="${applicationName}"
         android:requestLegacyExternalStorage="true"
-        android:icon="@mipmap/ic_launcher">
+        android:icon="@mipmap/launcher_icon">
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="${applicationId}.provider"
