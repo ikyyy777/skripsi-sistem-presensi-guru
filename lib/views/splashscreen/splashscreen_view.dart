@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:presensi_guru/utils/cache.dart';
 import 'package:presensi_guru/utils/routes.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -17,8 +18,10 @@ class _SplashscreenViewState extends State<SplashscreenView> {
     String? savedUsername = sharedPreferences.getString('savedUsername');
     if (savedUsername != null) {
       if (savedUsername == "admin") {
+        Cache.loggedUsername = "admin";
         Get.offAllNamed(Routes.adminDashboardView);
       } else {
+        Cache.loggedUsername = savedUsername;
         Get.offAllNamed(Routes.guruDashboardView);
       }
     } else {

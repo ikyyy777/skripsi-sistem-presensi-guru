@@ -300,7 +300,7 @@ class AdminFormulirEditGuru extends StatelessWidget {
                         adminController.updateTeacherData(
                           username: adminController.daftarGuru[index].username,
                           nama: formName.text,
-                          jenisKelamin: formGender.text,
+                          jenisKelamin: adminController.formGender.text,
                           tempatTanggalLahir: formPlaceDateOfBirth.text,
                           agama: formReligion.text,
                           alamat: formAddress.text,

@@ -57,14 +57,18 @@ class AdminLihatPresensiGuruView extends StatelessWidget {
             } else if (snapshot.hasError) {
               return Center(child: Text("Error: ${snapshot.error}"));
             } else if (!snapshot.hasData || snapshot.data == null) {
-              return Center(
-                child: Text(
-                  "Tidak ada data presensi",
-                  style: TextstyleConstant.nunitoSansBold.copyWith(
-                    fontSize: 16,
-                    color: ColorConstant.black,
+              return Column(
+                children: [
+                  Center(
+                    child: Text(
+                      "Tidak ada data presensi",
+                      style: TextstyleConstant.nunitoSansMedium.copyWith(
+                        fontSize: 16,
+                        color: ColorConstant.black,
+                      ),
+                    ),
                   ),
-                ),
+                ],
               );
             } else {
               final presensi = snapshot.data!;

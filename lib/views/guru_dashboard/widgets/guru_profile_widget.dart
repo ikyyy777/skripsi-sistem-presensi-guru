@@ -23,21 +23,19 @@ class GuruProfileWidget extends StatelessWidget {
           width: 50,
           height: 50,
           decoration: BoxDecoration(
-            // image: const DecorationImage(
-            //   image: AssetImage("assets/images/admin_profile.png"),
-            // ),
             border: Border.all(
               color: ColorConstant.grayBorder,
               width: 1,
             ),
             borderRadius: BorderRadius.circular(90),
           ),
-          child: Icon(
-            Icons.person_2_rounded,
-            size: 50,
-            color: ColorConstant.gray30,
-          ),
-        ),
+          child: guruController.dataGuru.value?.jenisKelamin == "Laki-laki" ? Image.asset(
+            "assets/images/male_teacher.png",
+            fit: BoxFit.cover,
+          ) : Image.asset(
+            "assets/images/female_teacher.png", 
+            fit: BoxFit.cover,
+          )),
         title: Text(
           "Selamat ${DatetimeGetters.getTimeOfDay()}",
           style: TextstyleConstant.nunitoSansBold.copyWith(

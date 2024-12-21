@@ -5,9 +5,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:get/get.dart';
 import 'package:network_info_plus/network_info_plus.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:presensi_guru/controllers/login_controller.dart';
 import 'package:presensi_guru/models/guru_model.dart';
 import 'package:presensi_guru/models/presensi_model.dart';
+import 'package:presensi_guru/utils/cache.dart';
 import 'package:presensi_guru/utils/datetime_getters.dart';
 import 'package:presensi_guru/utils/get_dialogs.dart';
 
@@ -39,32 +39,27 @@ class GuruController extends GetxController {
   }
 
   void initPage() async {
-    final loginController = Get.put(LoginController());
-
     isPageLoading.value = true;
     await getTeacherData();
     presensiModel.value = await getTeacherPresenceData(
-        loginController.loggedUsername.value, yearNow, monthNow);
+        Cache.loggedUsername, yearNow, monthNow);
     isPageLoading.value = false;
   }
 
   void startBackgroundTask() {
-    final loginController = Get.put(LoginController());
-
     backgroundTask =
         Timer.periodic(const Duration(seconds: 1), (Timer timer) async {
       await getTeacherData();
       presensiModel.value = await getTeacherPresenceData(
-          loginController.loggedUsername.value, yearNow, monthNow);
+          Cache.loggedUsername, yearNow, monthNow);
     });
   }
 
   Future<void> getTeacherData() async {
     try {
-      final loginController = Get.put(LoginController());
       DocumentSnapshot doc = await firestore
           .collection('pegawai')
-          .doc(loginController.loggedUsername.value)
+          .doc(Cache.loggedUsername)
           .get();
       dataGuru.value = GuruModel.fromDocumentSnapshot(doc);
     } catch (e) {
@@ -152,8 +147,6 @@ class GuruController extends GetxController {
       String todayDate = DatetimeGetters.getDateNowInt();
       String jamMasuk = DateTime.now().toString().split(" ")[1].substring(0, 8);
 
-      final loginController = Get.put(LoginController());
-
       // Validasi hari Sabtu dan Minggu
       int todayWeekday = DateTime.now().weekday; // 6 = Sabtu, 7 = Minggu
       if (todayWeekday == 6 || todayWeekday == 7) {
@@ -163,9 +156,9 @@ class GuruController extends GetxController {
       }
 
       String presensiId =
-          "${loginController.loggedUsername}_${yearNow}_$monthNow";
+          "${Cache.loggedUsername}_${yearNow}_$monthNow";
       String riwayatId =
-          "${loginController.loggedUsername}_${yearNow}_${monthNow}_$dayNow";
+          "${Cache.loggedUsername}_${yearNow}_${monthNow}_$dayNow";
 
       // Check if user already has attendance for today
       QuerySnapshot riwayatData = await firestore
@@ -190,7 +183,7 @@ class GuruController extends GetxController {
         // If presensi document doesn't exist, create it
         await firestore.collection('presensi').doc(presensiId).set({
           "presensi_id": presensiId,
-          "username": loginController.loggedUsername.value,
+          "username": Cache.loggedUsername,
           "tahun": yearNow,
           "bulan": monthNow,
           "total_hadir": 1,

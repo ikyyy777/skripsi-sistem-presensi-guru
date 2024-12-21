@@ -4,6 +4,7 @@ import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:presensi_guru/utils/cache.dart';
 import 'package:presensi_guru/utils/get_dialogs.dart';
 import 'package:presensi_guru/utils/routes.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -11,8 +12,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 class LoginController extends GetxController {
   TextEditingController username = TextEditingController();
   TextEditingController password = TextEditingController();
-
-  RxString loggedUsername = "".obs;
 
   RxBool isPasswordHidden = true.obs;
 
@@ -60,14 +59,14 @@ class LoginController extends GetxController {
                   .update({'id_perangkat': deviceId});
             }
             Get.back();
-            loggedUsername.value = username.text;
+            Cache.loggedUsername = username.text;
             SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
             sharedPreferences.setString('savedUsername', username.text);
             Get.toNamed(Routes.adminDashboardView);
           } else {
             if (adminData['id_perangkat'] == deviceId) {
               Get.back();
-              loggedUsername.value = username.text;
+              Cache.loggedUsername = username.text;
               SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
               sharedPreferences.setString('savedUsername', username.text);
               Get.toNamed(Routes.adminDashboardView);
@@ -101,14 +100,14 @@ class LoginController extends GetxController {
                   .update({'id_perangkat': deviceId});
             }
             Get.back();
-            loggedUsername.value = username.text;
+            Cache.loggedUsername = username.text;
             SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
             sharedPreferences.setString('savedUsername', username.text);
             Get.toNamed(Routes.guruDashboardView);
           } else {
             if (guruData['id_perangkat'] == deviceId) {
               Get.back();
-              loggedUsername.value = username.text;
+              Cache.loggedUsername = username.text;
               SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
               sharedPreferences.setString('savedUsername', username.text);
               Get.toNamed(Routes.guruDashboardView);
