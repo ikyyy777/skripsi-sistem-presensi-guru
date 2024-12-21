@@ -16,7 +16,11 @@ class _SplashscreenViewState extends State<SplashscreenView> {
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
     String? savedUsername = sharedPreferences.getString('savedUsername');
     if (savedUsername != null) {
-      Get.offAllNamed(Routes.adminDashboardView);
+      if (savedUsername == "admin") {
+        Get.offAllNamed(Routes.adminDashboardView);
+      } else {
+        Get.offAllNamed(Routes.guruDashboardView);
+      }
     } else {
       Get.offAllNamed(Routes.loginView);
     }
