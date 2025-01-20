@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:get/get.dart';
 import 'package:presensi_guru/constants/color_constant.dart';
+import 'package:presensi_guru/controllers/admin_controller.dart';
 import 'package:presensi_guru/views/admin_dashboard/widgets/admin_card_widget.dart';
 import 'package:presensi_guru/views/admin_dashboard/widgets/admin_daftar_guru_widget.dart';
 import 'package:presensi_guru/views/admin_dashboard/widgets/admin_profile_widget.dart';
@@ -16,6 +18,7 @@ class AdminDashboardView extends StatefulWidget {
 
 class _AdminDashboardViewState extends State<AdminDashboardView> {
   DateTime? lastPressed;
+  final AdminController adminController = Get.put(AdminController());
 
   @override
   Widget build(BuildContext context) {
@@ -66,6 +69,7 @@ class _AdminDashboardViewState extends State<AdminDashboardView> {
                   AdminDaftarGuruWidget(),
                   const SizedBox(height: 20),
                   const AdminTambahGuruButtonWidget(),
+                  const SizedBox(height: 20),
                 ],
               ),
             ),

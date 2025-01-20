@@ -142,6 +142,14 @@ class GuruController extends GetxController {
 
   Future<void> postPresence() async {
     try {
+      // Validasi koneksi WiFi sekolah
+      bool isConnectedToSchoolWifi = await isConnectedWifiSchool();
+      if (!isConnectedToSchoolWifi) {
+        GetDialogs.showDialog1("Gagal Presensi", 
+            "Anda harus terhubung ke WiFi sekolah untuk melakukan presensi.");
+        return;
+      }
+
       final keterangan = checkOntime();
       String todayDateTime = DatetimeGetters.getFormattedDateTimeNow();
       String todayDate = DatetimeGetters.getDateNowInt();

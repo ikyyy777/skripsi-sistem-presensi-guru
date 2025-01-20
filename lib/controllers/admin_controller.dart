@@ -8,6 +8,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:excel/excel.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:presensi_guru/constants/color_constant.dart';
@@ -90,6 +91,8 @@ class AdminController extends GetxController {
   Future<Presensi?> getTeacherPresenceData(
       String username, int year, int month) async {
     try {
+      log("Memulai pengambilan data presensi untuk username: $username, tahun: $year, bulan: $month");
+
       // Referensi koleksi
       CollectionReference presensiRef =
           FirebaseFirestore.instance.collection('presensi');
@@ -115,13 +118,18 @@ class AdminController extends GetxController {
           .where('presensi_id', isEqualTo: presensiId)
           .get();
 
-      // Map riwayat presensi ke model
+      // Map riwayat presensi ke model dan urutkan
       List<RiwayatPresensi> riwayatPresensiList =
           riwayatPresensiSnapshot.docs.map((doc) {
         return RiwayatPresensi.fromMap(doc.data() as Map<String, dynamic>);
       }).toList();
 
-      // Buat model Presensi
+      // Urutkan berdasarkan dibuat_pada
+      riwayatPresensiList.sort((a, b) {
+        return a.dibuatPada.compareTo(b.dibuatPada);
+      });
+
+      // Buat model Presensi dengan data yang sudah diurutkan
       return Presensi.fromMap(presensiData, riwayatPresensiList);
     } catch (e) {
       log("Terjadi kesalahan saat mengambil data presensi: $e");
@@ -172,8 +180,6 @@ class AdminController extends GetxController {
       log('Error fetching data guru: $e');
     }
   }
-
-  /// Mengambil data presensi guru
 
   /// Menambahkan data guru baru ke Firestore
   Future<void> addTeacher() async {
