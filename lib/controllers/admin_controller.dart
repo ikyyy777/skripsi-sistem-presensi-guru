@@ -101,35 +101,44 @@ class AdminController extends GetxController {
 
       // ID presensi
       String presensiId = "${username}_${year}_$month";
+      log("ID presensi yang dibentuk: $presensiId");
 
       // Query presensi
+      log("Melakukan query untuk dokumen presensi dengan ID: $presensiId");
       DocumentSnapshot presensiDoc = await presensiRef.doc(presensiId).get();
       if (!presensiDoc.exists) {
         log("Data presensi tidak ditemukan untuk ID: $presensiId");
         return null;
       }
+      log("Data presensi ditemukan untuk ID: $presensiId");
 
       // Ambil data presensi
       Map<String, dynamic> presensiData =
           presensiDoc.data() as Map<String, dynamic>;
+      log("Data presensi berhasil diambil: $presensiData");
 
       // Query riwayat presensi terkait
+      log("Melakukan query untuk riwayat presensi terkait dengan presensi_id: $presensiId");
       QuerySnapshot riwayatPresensiSnapshot = await riwayatPresensiRef
           .where('presensi_id', isEqualTo: presensiId)
           .get();
+      log("Jumlah dokumen riwayat presensi yang ditemukan: ${riwayatPresensiSnapshot.docs.length}");
 
       // Map riwayat presensi ke model dan urutkan
       List<RiwayatPresensi> riwayatPresensiList =
           riwayatPresensiSnapshot.docs.map((doc) {
+        log("Memproses dokumen riwayat presensi: ${doc.id}");
         return RiwayatPresensi.fromMap(doc.data() as Map<String, dynamic>);
       }).toList();
 
       // Urutkan berdasarkan dibuat_pada
+      log("Mengurutkan riwayat presensi berdasarkan field 'dibuat_pada'");
       riwayatPresensiList.sort((a, b) {
         return a.dibuatPada.compareTo(b.dibuatPada);
       });
 
       // Buat model Presensi dengan data yang sudah diurutkan
+      log("Membuat model Presensi dengan data yang sudah diurutkan");
       return Presensi.fromMap(presensiData, riwayatPresensiList);
     } catch (e) {
       log("Terjadi kesalahan saat mengambil data presensi: $e");
