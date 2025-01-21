@@ -42,9 +42,11 @@ class _AdminLihatPresensiGuruViewState
     } catch (e) {
       errorMessage = "Error: $e";
     } finally {
-      setState(() {
-        isLoading = false;
-      });
+      if (mounted) {
+        setState(() {
+          isLoading = false;
+        });
+      }
     }
   }
 

@@ -86,6 +86,24 @@ class AdminController extends GetxController {
     });
   }
 
+  /// Fungsi helper untuk mengecek koneksi internet
+  Future<bool> _checkInternetConnection() async {
+    try {
+      final result = await InternetAddress.lookup('google.com');
+      return result.isNotEmpty && result[0].rawAddress.isNotEmpty;
+    } on SocketException catch (_) {
+      return false;
+    }
+  }
+
+  /// Fungsi helper untuk menampilkan dialog error koneksi
+  void _showConnectionError() {
+    GetDialogs.showDialog1(
+      "Kesalahan Koneksi", 
+      "Tidak dapat terhubung ke server. Mohon periksa koneksi internet Anda dan coba lagi."
+    );
+  }
+
   /// Mengambil data presensi guru
   Future<Presensi?> getTeacherPresenceData(
       String username, int year, int month) async {
@@ -147,23 +165,44 @@ class AdminController extends GetxController {
 
   /// Mengambil data untuk ditampilkan di admin card
   Future<void> fetchAdminCardData() async {
-    // Mendapatkan total guru
-    QuerySnapshot pegawaiCollection =
-        await firestore.collection('pegawai').get();
+    try {
+      // Mendapatkan total guru
+      QuerySnapshot pegawaiCollection =
+          await firestore.collection('pegawai').get();
 
-    // Hitung jumlah dokumen (dikurangi 1 untuk admin)
-    int documentCount = pegawaiCollection.docs.length;
-    totalGuru.value = documentCount - 1;
+      // Hitung jumlah dokumen (dikurangi 1 untuk admin)
+      int documentCount = pegawaiCollection.docs.length;
+      totalGuru.value = documentCount - 1;
 
-    // Mendapatkan device id ponsel terdaftar
-    DocumentSnapshot adminDoc =
-        await firestore.collection("pegawai").doc("admin").get();
-    if (adminDoc.exists) {
-      final adminData = adminDoc.data() as Map<String, dynamic>;
-      deviceId.value = adminData["id_perangkat"];
-    } else {
+      // Mendapatkan device id ponsel terdaftar
+      DocumentSnapshot adminDoc =
+          await firestore.collection("pegawai").doc("admin").get();
+      if (adminDoc.exists) {
+        final adminData = adminDoc.data() as Map<String, dynamic>;
+        deviceId.value = adminData["id_perangkat"];
+      } else {
+        GetDialogs.showDialog1(
+            "Kesalahan Fatal!", "Tidak dapat terhubung ke database!");
+      }
+    } on FirebaseException catch (e) {
+      if (e.code == 'network-request-failed') {
+        GetDialogs.showDialog1(
+          "Kesalahan Koneksi", 
+          "Periksa koneksi internet Anda dan coba lagi."
+        );
+      } else {
+        GetDialogs.showDialog1(
+          "Kesalahan Server",
+          "Terjadi kesalahan saat mengakses database: ${e.message}"
+        );
+      }
+      log("Firebase error: ${e.message}");
+    } catch (e) {
+      log("Error: $e");
       GetDialogs.showDialog1(
-          "Kesalahan Fatal!", "Tidak dapat terhubung ke database!");
+        "Kesalahan",
+        "Terjadi kesalahan tak terduga. Silakan coba lagi."
+      );
     }
   }
 
@@ -180,62 +219,94 @@ class AdminController extends GetxController {
           .toList();
 
       daftarGuru.value = fetchedGuru;
+    } on FirebaseException catch (e) {
+      if (e.code == 'network-request-failed') {
+        GetDialogs.showDialog1(
+          "Kesalahan Koneksi", 
+          "Periksa koneksi internet Anda dan coba lagi."
+        );
+      } else {
+        GetDialogs.showDialog1(
+          "Kesalahan Server",
+          "Terjadi kesalahan saat mengakses data guru: ${e.message}"
+        );
+      }
+      log("Firebase error: ${e.message}");
     } catch (e) {
+      log("Error: $e");
       GetDialogs.showDialog1(
-        "Kesalahan!",
-        "Gagal memuat daftar guru: $e",
+        "Kesalahan",
+        "Terjadi kesalahan saat memuat daftar guru. Silakan coba lagi."
       );
-      log('Error fetching data guru: $e');
     }
   }
 
   /// Menambahkan data guru baru ke Firestore
   Future<void> addTeacher() async {
-    // Cek username duplikat
-    QuerySnapshot querySnapshot = await firestore
-        .collection('pegawai')
-        .where('username', isEqualTo: formUsername.text)
-        .get();
+    try {
+      if (!await _checkInternetConnection()) {
+        _showConnectionError();
+        return;
+      }
 
-    if (querySnapshot.docs.isNotEmpty) {
+      // Cek username duplikat
+      QuerySnapshot querySnapshot = await firestore
+          .collection('pegawai')
+          .where('username', isEqualTo: formUsername.text)
+          .get();
+
+      if (querySnapshot.docs.isNotEmpty) {
+        GetDialogs.showDialog1(
+          "Guru sudah terdaftar!",
+          "Username guru yang Anda masukkan sudah digunakan. Silakan pilih username lain.",
+        );
+        return;
+      }
+
+      // Tambah data guru baru
+      await firestore.collection('pegawai').doc(formUsername.text).set({
+        'username': formUsername.text,
+        'password': formPassword.text,
+        'nama': formName.text,
+        'jenis_kelamin': formGender.text,
+        'tempat_tanggal_lahir': formPlaceDateOfBirth.text,
+        'agama': formReligion.text,
+        'alamat': formAddress.text,
+        'email': formEmail.text,
+        'no_hp': formPhoneNumber.text,
+        'NIP': formNIP.text,
+        'NUPTK': formNUPTK.text,
+        'id_perangkat': "",
+        'dibuat_pada': FieldValue.serverTimestamp(),
+      });
+
+      // Reset form fields
+      formUsername.clear();
+      formPassword.clear();
+      formName.clear();
+      formGender.clear();
+      formPlaceDateOfBirth.clear();
+      formReligion.clear();
+      formAddress.clear();
+      formEmail.clear();
+      formPhoneNumber.clear();
+      formNIP.clear();
+      formNUPTK.clear();
+
+      GetDialogs.showSnackBar1("Guru Ditambahkan", "Berhasil menambah guru");
+    } on FirebaseException catch (e) {
+      log("Firebase error: ${e.message}");
       GetDialogs.showDialog1(
-        "Guru sudah terdaftar!",
-        "Username guru yang Anda masukkan sudah digunakan. Silakan pilih username lain.",
+        "Kesalahan Server",
+        "Gagal menambahkan guru: ${e.message}"
       );
-      return;
+    } catch (e) {
+      log("Error: $e");
+      GetDialogs.showDialog1(
+        "Kesalahan",
+        "Terjadi kesalahan saat menambah guru. Silakan coba lagi."
+      );
     }
-
-    // Tambah data guru baru
-    await firestore.collection('pegawai').doc(formUsername.text).set({
-      'username': formUsername.text,
-      'password': formPassword.text,
-      'nama': formName.text,
-      'jenis_kelamin': formGender.text,
-      'tempat_tanggal_lahir': formPlaceDateOfBirth.text,
-      'agama': formReligion.text,
-      'alamat': formAddress.text,
-      'email': formEmail.text,
-      'no_hp': formPhoneNumber.text,
-      'NIP': formNIP.text,
-      'NUPTK': formNUPTK.text,
-      'id_perangkat': "",
-      'dibuat_pada': FieldValue.serverTimestamp(),
-    });
-
-    // Reset form fields
-    formUsername.clear();
-    formPassword.clear();
-    formName.clear();
-    formGender.clear();
-    formPlaceDateOfBirth.clear();
-    formReligion.clear();
-    formAddress.clear();
-    formEmail.clear();
-    formPhoneNumber.clear();
-    formNIP.clear();
-    formNUPTK.clear();
-
-    GetDialogs.showSnackBar1("Guru Ditambahkan", "Berhasil menambah guru");
   }
 
   /// Mengupdate password admin
@@ -274,6 +345,11 @@ class AdminController extends GetxController {
     required String idPerangkat,
   }) async {
     try {
+      if (!await _checkInternetConnection()) {
+        _showConnectionError();
+        return;
+      }
+
       await firestore.collection('pegawai').doc(username).update({
         'nama': nama,
         'jenis_kelamin': jenisKelamin,
@@ -290,12 +366,18 @@ class AdminController extends GetxController {
 
       GetDialogs.showSnackBar1(
           "Guru Diperbarui", "Berhasil memperbarui data guru");
-    } catch (e) {
+    } on FirebaseException catch (e) {
+      log("Firebase error: ${e.message}");
       GetDialogs.showDialog1(
-        "Kesalahan!",
-        "Gagal memperbarui data guru: $e",
+        "Kesalahan Server",
+        "Gagal memperbarui data guru: ${e.message}"
       );
-      log('Error updating guru: $e');
+    } catch (e) {
+      log("Error: $e");
+      GetDialogs.showDialog1(
+        "Kesalahan",
+        "Terjadi kesalahan saat memperbarui data. Silakan coba lagi."
+      );
     }
   }
 

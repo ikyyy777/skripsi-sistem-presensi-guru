@@ -62,7 +62,24 @@ class GuruController extends GetxController {
           .doc(Cache.loggedUsername)
           .get();
       dataGuru.value = GuruModel.fromDocumentSnapshot(doc);
+    } on FirebaseException catch (e) {
+      if (e.code == 'network-request-failed') {
+        GetDialogs.showDialog1(
+          "Gagal Mengambil Data", 
+          "Periksa koneksi internet Anda dan coba lagi."
+        );
+      } else {
+        GetDialogs.showDialog1(
+          "Terjadi Kesalahan", 
+          "Gagal mengambil data: ${e.message}"
+        );
+      }
+      log(e.toString());
     } catch (e) {
+      GetDialogs.showDialog1(
+        "Terjadi Kesalahan", 
+        "Gagal mengambil data guru. Silakan coba lagi nanti."
+      );
       log(e.toString());
     }
   }
@@ -103,7 +120,25 @@ class GuruController extends GetxController {
 
       // Buat model Presensi
       return Presensi.fromMap(presensiData, riwayatPresensiList);
+    } on FirebaseException catch (e) {
+      if (e.code == 'network-request-failed') {
+        GetDialogs.showDialog1(
+          "Gagal Mengambil Data", 
+          "Periksa koneksi internet Anda dan coba lagi."
+        );
+      } else {
+        GetDialogs.showDialog1(
+          "Terjadi Kesalahan", 
+          "Gagal mengambil data presensi: ${e.message}"
+        );
+      }
+      log("Terjadi kesalahan saat mengambil data presensi: $e");
+      return null;
     } catch (e) {
+      GetDialogs.showDialog1(
+        "Terjadi Kesalahan", 
+        "Gagal mengambil data presensi. Silakan coba lagi nanti."
+      );
       log("Terjadi kesalahan saat mengambil data presensi: $e");
       return null;
     }
@@ -209,6 +244,7 @@ class GuruController extends GetxController {
         if (keterangan == "Hadir") {
           totalHadir++;
         } else if (keterangan == "Telat") {
+          totalHadir++;
           totalTelat++;
         }
 
@@ -231,10 +267,25 @@ class GuruController extends GetxController {
       GetDialogs.showSnackBar1(
           "Sukses Presensi", "Terima kasih sudah presensi");
       initPage();
+    } on FirebaseException catch (e) {
+      if (e.code == 'network-request-failed') {
+        GetDialogs.showDialog1(
+          "Gagal Presensi", 
+          "Periksa koneksi internet Anda dan coba lagi."
+        );
+      } else {
+        GetDialogs.showDialog1(
+          "Gagal Presensi", 
+          "Terjadi kesalahan: ${e.message}"
+        );
+      }
+      log(e.toString());
     } catch (e) {
       log(e.toString());
       GetDialogs.showDialog1(
-          "Gagal Presensi", "Terjadi kesalahan, coba lagi nanti.");
+        "Gagal Presensi", 
+        "Terjadi kesalahan, coba lagi nanti."
+      );
     }
   }
 }
