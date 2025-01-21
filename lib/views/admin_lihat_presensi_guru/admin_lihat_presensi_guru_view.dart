@@ -8,7 +8,7 @@ import 'package:presensi_guru/views/admin_lihat_presensi_guru/widgets/admin_peri
 import 'package:presensi_guru/views/admin_lihat_presensi_guru/widgets/admin_riwayat_presensi_widget.dart';
 
 class AdminLihatPresensiGuruView extends StatefulWidget {
-  AdminLihatPresensiGuruView({super.key, required this.usernameGuru});
+  const AdminLihatPresensiGuruView({super.key, required this.usernameGuru});
 
   final String usernameGuru;
 
