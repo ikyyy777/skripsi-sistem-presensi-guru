@@ -638,7 +638,16 @@ class AdminController extends GetxController {
           await firestore
               .collection('presensi')
               .doc(presensiId)
-              .set({'total_hadir': 1, 'total_cuti': 0, 'total_telat': 0});
+              .set({
+            'presensi_id': presensiId,
+            'username': username,
+            'tahun': dateTime.year,
+            'bulan': dateTime.month,
+            'total_hadir': 1,
+            'total_cuti': 0, 
+            'total_telat': 0,
+            'dibuat_pada': todayDate,
+          });
         } else {
           await firestore.collection('presensi').doc(presensiId).update({
             'total_hadir': FieldValue.increment(1),
@@ -665,7 +674,16 @@ class AdminController extends GetxController {
           await firestore
               .collection('presensi')
               .doc(presensiId)
-              .set({'total_cuti': 1, 'total_hadir': 0, 'total_telat': 0});
+              .set({
+            'presensi_id': presensiId,
+            'username': username,
+            'tahun': dateTime.year,
+            'bulan': dateTime.month,
+            'total_hadir': 0,
+            'total_cuti': 1,
+            'total_telat': 0,
+            'dibuat_pada': todayDate,
+          });
         } else {
           await firestore.collection('presensi').doc(presensiId).update({
             'total_cuti': FieldValue.increment(1),
