@@ -153,7 +153,7 @@ class GuruCardWidget extends StatelessWidget {
                         ),
                         const SizedBox(height: 5),
                         Text(
-                          "09:00:00",
+                          "07:00:00",
                           style: TextstyleConstant.nunitoSansBold.copyWith(
                             color: ColorConstant.white,
                             fontSize: 16,
